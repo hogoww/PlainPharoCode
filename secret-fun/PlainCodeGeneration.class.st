@@ -8,14 +8,25 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
+PlainCodeGeneration class >> GenerateCode: aSelector withBody: aBlock [
+	| updatedBlock |
+
+	updatedBlock:=self aCodeGeneratorFromBlock:aBlock.
+	^RBMethodNode
+		selector: aSelector
+		arguments: updatedBlock arguments
+		body: updatedBlock body.
+
+]
+
+{ #category : #'as yet unclassified' }
 PlainCodeGeneration class >> aCodeGeneratorFromBlock:aBlock [
-	| debugerEnv visitor ast |
+	| visitor ast |
 	visitor:=CodeGenerationVisitor new
 		context:aBlock outerContext;
 		yourself.
 	ast:=aBlock sourceNode.
 	ast acceptVisitor: visitor.
-	self halt.
 	^ast
 ]
 
@@ -26,18 +37,18 @@ PlainCodeGeneration class >> aMethodThatGenerateCode: anArg [
 	n:=5.
 	c:='truc'.
 	a:=6.
-	^PlainCodeGeneration myMethodSelector:[|b|
+	^PlainCodeGeneration GenerateCode: #myMethodSelector:withArg: withBody:[:anotherArg :anotherAnotherArg | |b|
 		something.
-		[ a.b. ].
+		n ifTrue:[ anArg. b:=3. ].
 		^a.
 		].
 
 ]
 
-{ #category : #'as yet unclassified' }
-PlainCodeGeneration class >> doesNotUnderstand: aMessage [
-	^RBMethodNode new
-		selector: aMessage selector;
-		body: (self aCodeGeneratorFromBlock:aMessage argument);
-		yourself.
+{ #category : #formatting }
+PlainCodeGeneration class >> formatSelector: aSymbol withArguments: aCollection [ 
+	^RBMethodNode new 
+		selector: aSymbol;
+		arguments: aCollection;
+		asString
 ]

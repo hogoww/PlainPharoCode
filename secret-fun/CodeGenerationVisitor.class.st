@@ -21,7 +21,6 @@ CodeGenerationVisitor >> context: aContext [
 CodeGenerationVisitor >> replaceNode: aNode [
 	(context lookupSymbol: aNode name) 
 	ifNotNil:[:value| 
-		aNode crLog.
 		aNode name: value asString.
 		].
 ]
