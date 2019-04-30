@@ -9,21 +9,27 @@ Class {
 
 { #category : #'as yet unclassified' }
 PlainCodeGeneration class >> aCodeGeneratorFromBlock:aBlock [
-	| debugerEnv |
-	aBlock sourceNode.
-	debugerEnv:=aBlock outerContext gtBytecodeDebuggerRetrieveContextValues asDictionary. 
-	1halt.
-	^1
+	| debugerEnv visitor ast |
+	visitor:=CodeGenerationVisitor new
+		context:aBlock outerContext;
+		yourself.
+	ast:=aBlock sourceNode.
+	ast acceptVisitor: visitor.
+	self halt.
+	^ast
 ]
 
 { #category : #'as yet unclassified' }
 PlainCodeGeneration class >> aMethodThatGenerateCode: anArg [
-	| a n c b |
+	| a n c |
 	a:=3.
 	n:=5.
 	c:='truc'.
-	PlainCodeGeneration myMethodSelector:[
-		^b.
+	a:=6.
+	^PlainCodeGeneration myMethodSelector:[|b|
+		something.
+		[ a.b. ].
+		^a.
 		].
 
 ]
