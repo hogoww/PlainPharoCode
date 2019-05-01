@@ -18,6 +18,15 @@ CodeGenerationVisitor >> context: aContext [
 	^context:=aContext
 ]
 
+{ #category : #visiting }
+CodeGenerationVisitor >> getReplacementName: aString [
+	(context lookupSymbol: aString)
+	ifNotNil:[:value| 
+		^value asString
+		].
+	^aString asString
+]
+
 { #category : #accessing }
 CodeGenerationVisitor >> initialMethod [
 	^initialMethod
@@ -29,28 +38,22 @@ CodeGenerationVisitor >> initialMethod: aMethodNode [
 ]
 
 { #category : #visiting }
-CodeGenerationVisitor >> replaceNode: aNode [
-	(context lookupSymbol: aNode name) 
-	ifNotNil:[:value| 
-		aNode name: value asString.
-		].
-]
-
-{ #category : #visiting }
 CodeGenerationVisitor >> visitMessageNode: aMessageNode [
-	
-	aMessageNode receiver name isArray
+	(context lookupSymbol: aMessageNode receiver name) isArray
 	ifTrue:[
+
 		aMessageNode parent replaceNode: aMessageNode 
 			withNodes: ((context lookupSymbol: (aMessageNode receiver name)) collect:[:anElement|
-				RBMessageNode receiver: (RBVariableNode named:anElement)
-					selector: aMessageNode selector 
+				RBMessageNode receiver: (RBVariableNode named: (self getReplacementName: anElement))
+					selector: aMessageNode selector
 					arguments: aMessageNode arguments
 				]).
-		]
+		].
+	^aMessageNode
 ]
 
 { #category : #visiting }
 CodeGenerationVisitor >> visitVariableNode: aVariableNode [
-	self replaceNode: aVariableNode
+	aVariableNode name: (self getReplacementName: aVariableNode name).
+	^aVariableNode
 ]

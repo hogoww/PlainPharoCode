@@ -41,7 +41,8 @@ PlainCodeGeneration >> aMethodThatGenerateCode: anArg [
 	d:= { #a . #n }.
 	^PlainCodeGeneration new GenerateCode: #myMethodSelector:withArg: withBody:[:g :anotherAnotherArg |
 		something.
-		d ifTrue:[ anArg. b:=3. ].
+		d asArray.
+		c ifTrue:[ anArg. b:=3. ].
 		^a.
 		].
 
