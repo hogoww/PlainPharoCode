@@ -20,13 +20,13 @@ PlainCodeGeneration >> GenerateCode: aSelector withBody: aBlock [
 ]
 
 { #category : #'as yet unclassified' }
-PlainCodeGeneration >> aCodeGeneratorFromBlock:aBlock [
+PlainCodeGeneration >> aCodeGeneratorFromBlock:aBlock [ 
 	| visitor ast |
 	visitor:=CodeGenerationVisitor new
 		context:aBlock outerContext;
 		initialMethod: aBlock outerContext methodNode;
 		yourself.
-	ast:=aBlock sourceNode.
+	ast:=aBlock sourceNode copy.
 	ast acceptVisitor: visitor.
 	^ast
 ]

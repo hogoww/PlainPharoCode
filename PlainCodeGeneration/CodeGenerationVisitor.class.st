@@ -47,11 +47,9 @@ CodeGenerationVisitor >> visitMessageNode: aMessageNode [
 				RBMessageNode receiver: (RBVariableNode named: (self getReplacementName: anElement))
 					selector: (self getReplacementName: aMessageNode selector)
 					arguments: aMessageNode arguments
-					select.
 				]).
 		]
 	ifFalse:[
-			1halt.
 			aMessageNode selector: (self getReplacementName:aMessageNode selector)
 		].
 	^aMessageNode
