@@ -1,14 +1,14 @@
 Class {
 	#name : #PlainCodeGeneration,
 	#superclass : #Object,
-	#classInstVars : [
+	#instVars : [
 		'something'
 	],
-	#category : #'secret-fun'
+	#category : #PlainCodeGeneration
 }
 
 { #category : #'as yet unclassified' }
-PlainCodeGeneration class >> GenerateCode: aSelector withBody: aBlock [
+PlainCodeGeneration >> GenerateCode: aSelector withBody: aBlock [
 	| updatedBlock |
 
 	updatedBlock:=self aCodeGeneratorFromBlock:aBlock.
@@ -20,10 +20,11 @@ PlainCodeGeneration class >> GenerateCode: aSelector withBody: aBlock [
 ]
 
 { #category : #'as yet unclassified' }
-PlainCodeGeneration class >> aCodeGeneratorFromBlock:aBlock [
+PlainCodeGeneration >> aCodeGeneratorFromBlock:aBlock [
 	| visitor ast |
 	visitor:=CodeGenerationVisitor new
 		context:aBlock outerContext;
+		initialMethod: aBlock outerContext methodNode;
 		yourself.
 	ast:=aBlock sourceNode.
 	ast acceptVisitor: visitor.
@@ -31,22 +32,23 @@ PlainCodeGeneration class >> aCodeGeneratorFromBlock:aBlock [
 ]
 
 { #category : #'as yet unclassified' }
-PlainCodeGeneration class >> aMethodThatGenerateCode: anArg [
-	| a n c |
+PlainCodeGeneration >> aMethodThatGenerateCode: anArg [
+	| a n c d b |
 	a:=3.
 	n:=5.
 	c:='truc'.
 	a:=6.
-	^PlainCodeGeneration GenerateCode: #myMethodSelector:withArg: withBody:[:anotherArg :anotherAnotherArg | |b|
+	d:= { #a . #n }.
+	^PlainCodeGeneration new GenerateCode: #myMethodSelector:withArg: withBody:[:g :anotherAnotherArg |
 		something.
-		n ifTrue:[ anArg. b:=3. ].
+		d ifTrue:[ anArg. b:=3. ].
 		^a.
 		].
 
 ]
 
 { #category : #formatting }
-PlainCodeGeneration class >> formatSelector: aSymbol withArguments: aCollection [ 
+PlainCodeGeneration >> formatSelector: aSymbol withArguments: aCollection [ 
 	^RBMethodNode new 
 		selector: aSymbol;
 		arguments: aCollection;
