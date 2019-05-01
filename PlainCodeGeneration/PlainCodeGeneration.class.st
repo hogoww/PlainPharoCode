@@ -33,14 +33,17 @@ PlainCodeGeneration >> aCodeGeneratorFromBlock:aBlock [
 
 { #category : #'as yet unclassified' }
 PlainCodeGeneration >> aMethodThatGenerateCode: anArg [
-	| a n c d b |
+	| a n c d b u n2 |
 	a:=3.
-	n:=5.
 	c:='truc'.
 	a:=6.
-	d:= { #a . #n }.
+	d:= { #a . #c }.
+	u:= #aMessage.
+	b:= #-.
+	n:= #aMessageWith:.
+	n2:= #aMessage:with:.
 	^PlainCodeGeneration new GenerateCode: #myMethodSelector:withArg: withBody:[:g :anotherAnotherArg |
-		something.
+		something u.
 		d asArray.
 		c ifTrue:[ anArg. b:=3. ].
 		^a.

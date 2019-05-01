@@ -39,15 +39,20 @@ CodeGenerationVisitor >> initialMethod: aMethodNode [
 
 { #category : #visiting }
 CodeGenerationVisitor >> visitMessageNode: aMessageNode [
+
 	(context lookupSymbol: aMessageNode receiver name) isArray
 	ifTrue:[
-
 		aMessageNode parent replaceNode: aMessageNode 
 			withNodes: ((context lookupSymbol: (aMessageNode receiver name)) collect:[:anElement|
 				RBMessageNode receiver: (RBVariableNode named: (self getReplacementName: anElement))
-					selector: aMessageNode selector
+					selector: (self getReplacementName: aMessageNode selector)
 					arguments: aMessageNode arguments
+					select.
 				]).
+		]
+	ifFalse:[
+			1halt.
+			aMessageNode selector: (self getReplacementName:aMessageNode selector)
 		].
 	^aMessageNode
 ]
