@@ -30,7 +30,7 @@ PlainCodeGeneration >> aMethodThatGenerateCode: anArg [
 	b:= #-.
 	n:= #aMessageWith:.
 	n2:= #aMessage:with:.
-	^(PlainCodeGeneration new generateCode: #myMethodSelector:withArg: withBody:[:g :anotherAnotherArg |
+	^PlainCodeGeneration new generateCode: #myMethodSelector:withArg: withBody:[:g :anotherAnotherArg |
 		something n2:{ n . c }.
 		a aMes1 b:{ c }.
 		a n:{ a }.
@@ -38,7 +38,7 @@ PlainCodeGeneration >> aMethodThatGenerateCode: anArg [
 		a aMes.
 		c ifTrue:[ anArg. b:=3. ].
 		^a.
-		]).
+		].
 
 ]
 
