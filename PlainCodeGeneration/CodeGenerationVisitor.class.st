@@ -5,7 +5,7 @@ Class {
 		'context',
 		'initialMethod'
 	],
-	#category : #PlainCodeGeneration
+	#category : #'PlainCodeGeneration-format'
 }
 
 { #category : #accessing }
@@ -38,6 +38,22 @@ CodeGenerationVisitor >> initialMethod [
 { #category : #accessing }
 CodeGenerationVisitor >> initialMethod: aMethodNode [
 	^initialMethod := aMethodNode
+]
+
+{ #category : #visiting }
+CodeGenerationVisitor >> variableExpandsInArrayNode: anArrayNode [
+	| omm res |
+	
+
+
+	anArrayNode parent .
+	omm:=anArrayNode parent isMessage ifTrue:[ anArrayNode parent outerMostMessageNode ].
+	omm parent isReturn ifTrue:[self error:'Cannot duplicate a return'].
+	
+	res:=(context lookupSymbol: anArrayNode name) collect:[:aStatement| 
+		omm copy innerMostMessage receiver: (RBVariableNode named:aStatement)
+		].
+	omm parent replaceNode: omm withNodes: res.
 ]
 
 { #category : #visiting }
@@ -75,6 +91,11 @@ CodeGenerationVisitor >> visitMethodNode: aMethodNode [
 
 { #category : #visiting }
 CodeGenerationVisitor >> visitVariableNode: aVariableNode [
-	aVariableNode name: (self getReplacementName: aVariableNode name).
-	^aVariableNode
+	| resolvedVariable |
+	resolvedVariable := context lookupSymbol: aVariableNode name.
+
+	resolvedVariable isArray
+		ifTrue: [ self variableExpandsInArrayNode: aVariableNode ]
+		ifFalse:
+			[ aVariableNode name: (self getReplacementName: aVariableNode name) ]
 ]

@@ -2,9 +2,10 @@ Class {
 	#name : #PlainCodeGenerationTest,
 	#superclass : #TestCase,
 	#instVars : [
-		'anInstanceVariable'
+		'anInstanceVariable',
+		'parser'
 	],
-	#category : #PlainCodeGeneration
+	#category : #'PlainCodeGeneration-tests'
 }
 
 { #category : #'tests-variables' }
@@ -17,6 +18,7 @@ PlainCodeGenerationTest >> aTestExternargumentSet:anArg [
 	self assert: (self countID:'anArg' in: initialBlock sourceNode) equals: 1.
 	self assert: (self countID:'anArg' in: modifiedBlock) equals: 0. 
 	self assert: (self countID:'truc' in: modifiedBlock) equals: 1. 
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
 { #category : #'tests-variables' }
@@ -28,6 +30,7 @@ PlainCodeGenerationTest >> aTestExternargumentUnSet:anArg [
 	self assert: anArg isNil.
 	self assert: (self countID:'anArg' in: initialBlock sourceNode) equals: 1.
 	self assert: (self countID:'anArg' in: modifiedBlock) equals: 1. 
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
 { #category : #running }
@@ -38,6 +41,12 @@ PlainCodeGenerationTest >> countID: anID in: aNode [
 		yourself.
 	aNode acceptVisitor: visitor.
 	^visitor count.
+]
+
+{ #category : #running }
+PlainCodeGenerationTest >> setUp [
+	"Hooks that subclasses may override to define the fixture of test."
+	parser := RBParser.
 ]
 
 { #category : #'tests-messages' }
@@ -52,6 +61,7 @@ PlainCodeGenerationTest >> testBinarySelectors [
 	self assert: (self countID:'b:' in: initialBlock sourceNode) equals: 1.
 	self assert: (self countID:'b:' in: modifiedBlock) equals: 0.
 	self assert: (self countID: #- in: modifiedBlock) equals: 1.
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
 { #category : #'tests-variables' }
@@ -77,6 +87,7 @@ PlainCodeGenerationTest >> testExternTemporarySet [
 	self assert: (self countID:'t' in: modifiedBlock) equals: 0. 
 	self assert: (self countID:'truc' in: modifiedBlock) equals: 1.
 	
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 	
 ]
 
@@ -90,6 +101,8 @@ PlainCodeGenerationTest >> testExternTemporaryUnset [
 	self assert: t isNil.
 	self assert: (self countID:'t' in: initialBlock sourceNode) equals: 1.
 	self assert: (self countID:'t' in: modifiedBlock) equals: 1. 
+	
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
 { #category : #'tests-variables' }
@@ -97,10 +110,12 @@ PlainCodeGenerationTest >> testInnerArgument [
 	| initialBlock modifiedBlock |
 	"Nothing in the outer environnement, nothing changes"
 	initialBlock:=[:anArg | ^ anArg ].
-	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod: withBody: initialBlock.
 	
 	self assert: (self countID:'anArg' in: initialBlock sourceNode) equals: 2.
 	self assert: (self countID:'anArg' in: modifiedBlock) equals: 2. 
+	
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
 { #category : #'tests-variables' }
@@ -112,6 +127,8 @@ PlainCodeGenerationTest >> testInnerTemporary [
 	
 	self assert: (self countID:'t' in: initialBlock sourceNode) equals: 2.
 	self assert: (self countID:'t' in: modifiedBlock) equals: 2. 
+	
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
 { #category : #'tests-variables' }
@@ -129,6 +146,8 @@ PlainCodeGenerationTest >> testInstanceVariableSet [
 	self assert: (self countID:'anInstanceVariable' in: modifiedBlock) equals: 0. 
 	self assert: (self countID:'truc' in: modifiedBlock) equals: 1.
 	anInstanceVariable := nil.
+	
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
 { #category : #'tests-variables' }
@@ -144,6 +163,8 @@ PlainCodeGenerationTest >> testInstanceVariableUnset [
 	self assert: anInstanceVariable isNil.
 	self assert: (self countID:'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
 	self assert: (self countID:'anInstanceVariable' in: modifiedBlock) equals: 1. 
+	
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
 { #category : #'tests-messages' }
@@ -158,6 +179,8 @@ PlainCodeGenerationTest >> testKeywordMessageOneArg [
 	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
 	self assert: (self countID:'k:' in: modifiedBlock) equals: 0.
 	self assert: (self countID:#aSelector: in: modifiedBlock) equals: 1.
+	
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
 { #category : #'tests-messages' }
@@ -172,6 +195,8 @@ PlainCodeGenerationTest >> testKeywordMessageTwoArgs [
 	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
 	self assert: (self countID:'k:' in: modifiedBlock) equals: 0.
 	self assert: (self countID: #aSelector:withAnotherArg: in: modifiedBlock) equals: 1.
+	
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
 { #category : #'tests-mixte' }
@@ -193,6 +218,8 @@ PlainCodeGenerationTest >> testKeywordMessageWithTempSet [
 	self assert: (self countID:'t' in: modifiedBlock) equals: 0. 
 	self assert: (self countID:'aValue' in: modifiedBlock) equals: 2.
 	
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	
 ]
 
 { #category : #'tests-mixte' }
@@ -207,6 +234,7 @@ PlainCodeGenerationTest >> testTempSetOnSelectorAndVariable [
 	self assert: (self countID:'t' in: initialBlock sourceNode) equals: 2.
 	self assert: (self countID:'t' in: modifiedBlock) equals: 0.
 	self assert: (self countID:#aValue in: modifiedBlock) equals: 2.
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
 { #category : #'tests-mixte' }
@@ -220,6 +248,22 @@ PlainCodeGenerationTest >> testTempUnsetOnSelectorAndVariable [
 	self assert: t isNil.
 	self assert: (self countID:'t' in: initialBlock sourceNode) equals: 2.
 	self assert: (self countID:'t' in: modifiedBlock) equals: 2.
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+]
+
+{ #category : #'tests-variables' }
+PlainCodeGenerationTest >> testTryExpandOnAReturn [
+	| initialBlock modifiedBlock a |
+	"Cannot expand an array on a return, it would give the following code:
+	^druss
+	^ŵaylander
+	which is obviously not valid"
+	
+	a:={ 'druss' . 'waylander' }.
+	
+	initialBlock := [	^ a aMessage ].
+	self should: [PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock ] raise:Error.	
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
 { #category : #'tests-messages' }
@@ -234,6 +278,7 @@ PlainCodeGenerationTest >> testUnarySelector [
 	self assert: (self countID:'u' in: initialBlock sourceNode) equals: 1.
 	self assert: (self countID:'u' in: modifiedBlock) equals: 0.
 	self assert: (self countID:#truc in: modifiedBlock) equals: 1.
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
 { #category : #'tests-messages' }
@@ -248,4 +293,23 @@ PlainCodeGenerationTest >> testUnarySelectorWithEmptyArguments [
 	self assert: (self countID:'u:' in: initialBlock sourceNode) equals: 1.
 	self assert: (self countID:'u:' in: modifiedBlock) equals: 0.
 	self assert: (self countID:#truc in: modifiedBlock) equals: 1.
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+]
+
+{ #category : #'tests-variables' }
+PlainCodeGenerationTest >> testVariableNodeIsArray [
+	| initialBlock modifiedBlock a |
+	"The instanceVariable is set to nil, so it shouldn't replace anything"
+	
+	a:={ 'druss' . 'waylander' }.
+	
+	initialBlock := [	a aMessage ].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: a isArray.
+	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'druss' in: modifiedBlock) equals: 1.
+	self assert: (self countID:'waylander' in: modifiedBlock) equals: 1.
+	self assert: (self countID: #aMessage in: modifiedBlock) equals: 2.
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]

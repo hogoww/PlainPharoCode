@@ -6,7 +6,7 @@ Class {
 		'count',
 		'anID'
 	],
-	#category : #PlainCodeGeneration
+	#category : #'PlainCodeGeneration-tests'
 }
 
 { #category : #accessing }

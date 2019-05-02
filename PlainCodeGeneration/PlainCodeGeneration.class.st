@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'something'
 	],
-	#category : #PlainCodeGeneration
+	#category : #'PlainCodeGeneration-format'
 }
 
 { #category : #'as yet unclassified' }
