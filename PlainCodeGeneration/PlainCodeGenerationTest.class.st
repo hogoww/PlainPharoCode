@@ -40,6 +40,20 @@ PlainCodeGenerationTest >> countID: anID in: aNode [
 	^visitor count.
 ]
 
+{ #category : #'tests-messages' }
+PlainCodeGenerationTest >> testBinarySelectors [
+	| b initialBlock modifiedBlock|
+	"The variable is instanciated with a value, it should therefore be replaced"
+	b := #- .
+	initialBlock:=[ ^ 1 b:{ 1} ].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: b isNotNil.
+	self assert: (self countID:'b:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'b:' in: modifiedBlock) equals: 0.
+	self assert: (self countID: #- in: modifiedBlock) equals: 1.
+]
+
 { #category : #'tests-variables' }
 PlainCodeGenerationTest >> testExternArgumentSet [
 	self aTestExternargumentSet: 'truc'.
@@ -130,4 +144,108 @@ PlainCodeGenerationTest >> testInstanceVariableUnset [
 	self assert: anInstanceVariable isNil.
 	self assert: (self countID:'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
 	self assert: (self countID:'anInstanceVariable' in: modifiedBlock) equals: 1. 
+]
+
+{ #category : #'tests-messages' }
+PlainCodeGenerationTest >> testKeywordMessageOneArg [
+	| k initialBlock modifiedBlock|
+	"The variable is instanciated with a value, it should therefore be replaced"
+	k := #aSelector:.
+	initialBlock:=[ ^ 1 k:{ 1 } ].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: k isNotNil.
+	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'k:' in: modifiedBlock) equals: 0.
+	self assert: (self countID:#aSelector: in: modifiedBlock) equals: 1.
+]
+
+{ #category : #'tests-messages' }
+PlainCodeGenerationTest >> testKeywordMessageTwoArgs [
+	| k initialBlock modifiedBlock|
+	"The variable is instanciated with a value, it should therefore be replaced"
+	k := #aSelector:withAnotherArg:.
+	initialBlock:=[ ^ 1 k:{ 1 . 2 } ].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: k isNotNil.
+	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'k:' in: modifiedBlock) equals: 0.
+	self assert: (self countID: #aSelector:withAnotherArg: in: modifiedBlock) equals: 1.
+]
+
+{ #category : #'tests-mixte' }
+PlainCodeGenerationTest >> testKeywordMessageWithTempSet [
+	| k initialBlock modifiedBlock t |
+	"The variable is instanciated with a value, it should therefore be replaced"
+	k := #aSelector:.
+	t := 'aValue'.
+	initialBlock:=[ ^ t k:{ t } ].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: k isNotNil.
+	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'k:' in: modifiedBlock) equals: 0.
+	self assert: (self countID:#aSelector: in: modifiedBlock) equals: 1.
+	
+	self assert: t isNotNil.
+	self assert: (self countID:'t' in: initialBlock sourceNode) equals: 2.
+	self assert: (self countID:'t' in: modifiedBlock) equals: 0. 
+	self assert: (self countID:'aValue' in: modifiedBlock) equals: 2.
+	
+]
+
+{ #category : #'tests-mixte' }
+PlainCodeGenerationTest >> testTempSetOnSelectorAndVariable [
+	| initialBlock modifiedBlock t |
+	"The variable is instanciated with a value, it should therefore be replaced"
+	t := 'aValue'.
+	initialBlock:=[ ^ t t].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: t isNotNil.
+	self assert: (self countID:'t' in: initialBlock sourceNode) equals: 2.
+	self assert: (self countID:'t' in: modifiedBlock) equals: 0.
+	self assert: (self countID:#aValue in: modifiedBlock) equals: 2.
+]
+
+{ #category : #'tests-mixte' }
+PlainCodeGenerationTest >> testTempUnsetOnSelectorAndVariable [
+	| initialBlock modifiedBlock t |
+	"The variable is instanciated with a value, it should therefore be replaced"
+	t := nil.
+	initialBlock:=[ ^ t t].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: t isNil.
+	self assert: (self countID:'t' in: initialBlock sourceNode) equals: 2.
+	self assert: (self countID:'t' in: modifiedBlock) equals: 2.
+]
+
+{ #category : #'tests-messages' }
+PlainCodeGenerationTest >> testUnarySelector [
+	| u initialBlock modifiedBlock|
+	"The variable is instanciated with a value, it should therefore be replaced"
+	u := #truc.
+	initialBlock:=[ ^ 1 u ].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: u isNotNil.
+	self assert: (self countID:'u' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'u' in: modifiedBlock) equals: 0.
+	self assert: (self countID:#truc in: modifiedBlock) equals: 1.
+]
+
+{ #category : #'tests-messages' }
+PlainCodeGenerationTest >> testUnarySelectorWithEmptyArguments [
+	| u initialBlock modifiedBlock|
+	"The variable is instanciated with a value, it should therefore be replaced"
+	u := #truc.
+	initialBlock:=[ ^ 1 u:{} ].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: u isNotNil.
+	self assert: (self countID:'u:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'u:' in: modifiedBlock) equals: 0.
+	self assert: (self countID:#truc in: modifiedBlock) equals: 1.
 ]

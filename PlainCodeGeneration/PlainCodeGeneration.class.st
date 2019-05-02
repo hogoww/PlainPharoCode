@@ -32,10 +32,10 @@ PlainCodeGeneration >> aMethodThatGenerateCode: anArg [
 	n2:= #aMessage:with:.
 	^PlainCodeGeneration new generateCode: #myMethodSelector:withArg: withBody:[:g :anotherAnotherArg |
 		something n2:{ n . c }.
-		a aMes1 b:{ c }.
-		a n:{ a }.
-		c u.
-		a aMes.
+		d aMes1 b:{ d }.
+		d n:{ a }.
+		d u.
+		d aMes.
 		c ifTrue:[ anArg. b:=3. ].
 		^a.
 		].

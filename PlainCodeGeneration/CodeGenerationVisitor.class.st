@@ -43,27 +43,34 @@ CodeGenerationVisitor >> initialMethod: aMethodNode [
 { #category : #visiting }
 CodeGenerationVisitor >> visitMessageNode: aMessageNode [
 	super visitMessageNode:aMessageNode.
-"	(context lookupSymbol: aMessageNode receiver name) isArray
-	ifTrue:[
-		aMessageNode parent replaceNode: aMessageNode 
-			withNodes: ((context lookupSymbol: (aMessageNode receiver name)) collect:[:anElement|
-				RBMessageNode receiver: (RBVariableNode named: (self getReplacementName: anElement))
-					selector: (self getReplacementName: aMessageNode selector)
-					arguments: aMessageNode arguments
-				]).
-		]
-	ifFalse:["
-	^aMessageNode parent replaceNode: aMessageNode 
+	aMessageNode receiver isMessage | aMessageNode receiver isLiteral not ifFalse:[
+		(context lookupSymbol: aMessageNode receiver name) isArray
+		ifTrue:[
+			aMessageNode parent replaceNode: aMessageNode 
+				withNodes: ((context lookupSymbol: (aMessageNode receiver name)) collect:[:anElement|
+					RBMessageNode receiver: (RBVariableNode named: (self getReplacementName: anElement))
+						selector: (self getReplacementName: aMessageNode selector)
+						arguments: aMessageNode arguments
+					]).
+				].
+	].
+
+	aMessageNode parent replaceNode: aMessageNode 
 		withNode: (RBMessageNode receiver: aMessageNode receiver
 			selector: (self getReplacementName: (aMessageNode selector))
 			arguments: ([| args |
 				(self getReplacementName: (aMessageNode selector)) = aMessageNode selector
 				ifTrue:[aMessageNode arguments]
 				ifFalse:[
-					args:=aMessageNode arguments ifNotEmpty:[:argus| argus at:1] ifEmpty:[ ^ SequenceableCollection new].
-					args size > 0 ifTrue:[ args statements] ifFalse:[args]]] value)).
-	"]."
+					args:=aMessageNode arguments ifNotEmpty:[:argus| argus at:1] ifEmpty:[ OrderedCollection new].
+					args size > 0 ifTrue:[ args statements do:[:aStatement| aStatement acceptVisitor: self ]] ifFalse:[args]]]  value)).
+]
 
+{ #category : #visiting }
+CodeGenerationVisitor >> visitMethodNode: aMethodNode [
+	"allow to return the method node we just modified, while using the walk defined in super"
+	super visitMethodNode:aMethodNode.
+	^aMethodNode
 ]
 
 { #category : #visiting }
