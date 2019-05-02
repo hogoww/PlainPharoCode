@@ -1,6 +1,6 @@
 Class {
 	#name : #PlainCodeGeneration,
-	#superclass : #Object,
+	#superclass : #RBProgramNodeVisitor,
 	#instVars : [
 		'something'
 	],
