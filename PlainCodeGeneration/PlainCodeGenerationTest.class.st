@@ -2,21 +2,32 @@ Class {
 	#name : #PlainCodeGenerationTest,
 	#superclass : #TestCase,
 	#instVars : [
-		'context',
-		'initialMethod'
+		'anInstanceVariable'
 	],
 	#category : #PlainCodeGeneration
 }
 
 { #category : #'as yet unclassified' }
-PlainCodeGenerationTest >> aTestExternargument:anArg [
+PlainCodeGenerationTest >> aTestExternargumentSet:anArg [
 	| initialBlock modifiedBlock|
 	initialBlock:=[ ^ anArg ].
 	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
 	
+	self assert: anArg isNotNil.
 	self assert: (initialBlock sourceNode allChildren count:[:aNode | aNode isVariable and:[ aNode name = 'anArg' ]]) equals: 1.
 	self deny: (modifiedBlock allChildren anySatisfy: [:aNode | aNode isVariable and:[ aNode name = 'anArg' ]	]) equals: 1. 
 	self assert: (modifiedBlock allChildren count: [:aNode | aNode isVariable and:[ aNode name = 'truc' ]	]) equals: 1. 
+]
+
+{ #category : #'as yet unclassified' }
+PlainCodeGenerationTest >> aTestExternargumentUnSet:anArg [
+	| initialBlock modifiedBlock|
+	initialBlock:=[ ^ anArg ].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: anArg isNil.
+	self assert: (initialBlock sourceNode allChildren count:[:aNode | aNode isVariable and:[ aNode name = 'anArg' ]]) equals: 1.
+	self assert: (modifiedBlock allChildren count: [:aNode | aNode isVariable and:[ aNode name = 'anArg' ]	]) equals: 1. 
 ]
 
 { #category : #'as yet unclassified' }
@@ -27,6 +38,7 @@ PlainCodeGenerationTest >> testAnExternTemporarySet [
 	initialBlock:=[ ^ t ].
 	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
 	
+	self assert: t isNotNil.
 	self assert: (initialBlock sourceNode allChildren count:[:aNode | aNode isVariable and:[ aNode name = 't' ]	]) equals: 1.
 	self deny: (modifiedBlock allChildren anySatisfy: [:aNode | aNode isVariable and:[ aNode name = 't' ]	]). 
 	self assert: (modifiedBlock allChildren count:[:aNode | aNode isVariable and:[ aNode name = 'truc' ]	]) equals: 1.
@@ -35,8 +47,13 @@ PlainCodeGenerationTest >> testAnExternTemporarySet [
 ]
 
 { #category : #'as yet unclassified' }
-PlainCodeGenerationTest >> testExternArgument [
-	self aTestExternargument: 'truc'.
+PlainCodeGenerationTest >> testExternArgumentSet [
+	self aTestExternargumentSet: 'truc'.
+]
+
+{ #category : #'as yet unclassified' }
+PlainCodeGenerationTest >> testExternArgumentUnSet [
+	self aTestExternargumentUnSet: nil.
 ]
 
 { #category : #'as yet unclassified' }
@@ -46,6 +63,7 @@ PlainCodeGenerationTest >> testExternTemporaryUnset [
 	initialBlock:=[ ^ t ].
 	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
 	
+	self assert: t isNil.
 	self assert: (initialBlock sourceNode allChildren count: [:aNode | aNode isVariable and:[ aNode name = 't' ]	]) equals: 1.
 	self assert: (modifiedBlock allChildren count: [:aNode | aNode isVariable and:[ aNode name = 't' ]	]) equals: 1. 
 ]
@@ -70,4 +88,36 @@ PlainCodeGenerationTest >> testInnerargument [
 	
 	self assert: (initialBlock sourceNode allChildren count:[:aNode | aNode isVariable and:[ aNode name = 'anArg' ]]) equals: 2.
 	self assert: (modifiedBlock allChildren count: [:aNode | aNode isVariable and:[ aNode name = 'anArg' ]]) equals: 2. 
+]
+
+{ #category : #'as yet unclassified' }
+PlainCodeGenerationTest >> testInstanceVariableSet [
+	| initialBlock modifiedBlock |
+	"The instance variable is set, therefore should be replaced in the block"
+	
+	anInstanceVariable := 'truc' .
+	
+	initialBlock := [	^ anInstanceVariable ].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: anInstanceVariable isNotNil.
+	self assert: (initialBlock sourceNode allChildren count:[:aNode | aNode isVariable and:[ aNode name = 'anInstanceVariable' ]]) equals: 1.
+	self deny: (modifiedBlock allChildren anySatisfy: [:aNode | aNode isVariable and:[ aNode name = 'anInstanceVariable' ]]). 
+	self assert: (modifiedBlock allChildren count: [:aNode | aNode isVariable and:[ aNode name = 'truc' ]]) equals: 1.
+	anInstanceVariable := nil.
+]
+
+{ #category : #'as yet unclassified' }
+PlainCodeGenerationTest >> testInstanceVariableUnset [
+	| initialBlock modifiedBlock |
+	"The instanceVariable is set to nil, so it shouldn't replace anything"
+	
+	anInstanceVariable := nil.
+	
+	initialBlock := [	^ anInstanceVariable ].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: anInstanceVariable isNil.
+	self assert: (initialBlock sourceNode allChildren count:[:aNode | aNode isVariable and:[ aNode name = 'anInstanceVariable' ]]) equals: 1.
+	self assert: (modifiedBlock allChildren count: [:aNode | aNode isVariable and:[ aNode name = 'anInstanceVariable' ]]) equals: 1. 
 ]
