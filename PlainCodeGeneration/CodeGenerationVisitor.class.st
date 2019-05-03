@@ -51,7 +51,7 @@ CodeGenerationVisitor >> variableExpandsInArrayNode: anArrayNode [
 	| omm res |
 
 	omm:=anArrayNode parent isMessage ifTrue:[ anArrayNode parent outerMostMessageNode ].
-	omm parent isReturn ifTrue:[self error:'Cannot duplicate a return'].
+	omm parent isReturn ifTrue:[^ExpandReturnError new signal].
 	
 	res:=(context lookupSymbol: anArrayNode name) collect:[:aStatement| 
 		omm copy innerMostMessage receiver: (RBVariableNode named:aStatement)
@@ -61,22 +61,31 @@ CodeGenerationVisitor >> variableExpandsInArrayNode: anArrayNode [
 
 { #category : #visiting }
 CodeGenerationVisitor >> visitMessageNode: aMessageNode [
+	| replacementNodes  newSelector newArguments |
 	super visitMessageNode:aMessageNode.
+	
+	newSelector:=self getMessageSelector:aMessageNode selector.
+	newSelector = aMessageNode selector
+	ifTrue:[^self]. "Nothing to change here !"
+	
+	newArguments:=aMessageNode arguments 
+		ifNotEmpty:[:args| args at:1 ] "we take the ArrayNode's collection directly"
+		ifEmpty:[ OrderedCollection new ]. 
+	newArguments size > 0 ifTrue:[ newArguments := newArguments statements].
 
-	aMessageNode parent replaceNode: aMessageNode 
-		withNode: (RBMessageNode receiver: aMessageNode receiver
-			selector: (self getMessageSelector: (aMessageNode selector))
-			arguments: ([| args |
-				(self getMessageSelector: (aMessageNode selector)) = aMessageNode selector
-				ifTrue:[aMessageNode arguments]
-				ifFalse:[
-					args:=aMessageNode arguments ifNotEmpty:[:argus| argus at:1] ifEmpty:[ OrderedCollection new].
-					args size > 0 ifTrue:[ args statements] ifFalse:[args]]]  value)).
+	replacementNodes:=RBMessageNode receiver: aMessageNode receiver
+			selector: newSelector
+			arguments: newArguments.
+	
+	
+	aMessageNode parent replaceNode:aMessageNode withNode: replacementNodes.
 ]
 
 { #category : #visiting }
 CodeGenerationVisitor >> visitVariableNode: aVariableNode [
 	| resolvedVariable |
+	super visitVariableNode: aVariableNode.
+	
 	resolvedVariable := context lookupSymbol: aVariableNode name.
 
 	resolvedVariable isArray

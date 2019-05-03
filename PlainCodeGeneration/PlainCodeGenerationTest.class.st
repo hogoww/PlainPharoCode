@@ -253,7 +253,7 @@ PlainCodeGenerationTest >> testTempUnsetOnSelectorAndVariable [
 
 { #category : #'tests-variables' }
 PlainCodeGenerationTest >> testTryExpandOnAReturn [
-	| initialBlock modifiedBlock a |
+	| initialBlock a |
 	"Cannot expand an array on a return, it would give the following code:
 	^druss
 	^ŵaylander
@@ -262,8 +262,7 @@ PlainCodeGenerationTest >> testTryExpandOnAReturn [
 	a:={ 'druss' . 'waylander' }.
 	
 	initialBlock := [	^ a aMessage ].
-	self should: [PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock ] raise:Error.	
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self should: [PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock ] raise:ExpandReturnError.	
 ]
 
 { #category : #'tests-messages' }
