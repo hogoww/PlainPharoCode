@@ -50,7 +50,9 @@ CodeGenerationVisitor >> initialMethod: aMethodNode [
 CodeGenerationVisitor >> variableExpandsInArrayNode: anArrayNode [
 	| omm res |
 
-	omm:=anArrayNode parent isMessage ifTrue:[ anArrayNode parent outerMostMessageNode ].
+	(anArrayNode parent isMessage and:[ anArrayNode parent receiver = anArrayNode ])
+	ifFalse:[^self].
+	omm:=anArrayNode parent outerMostMessageNode.
 	omm parent isReturn ifTrue:[^ExpandReturnError new signal].
 	
 	res:=(context lookupSymbol: anArrayNode name) collect:[:aStatement| 

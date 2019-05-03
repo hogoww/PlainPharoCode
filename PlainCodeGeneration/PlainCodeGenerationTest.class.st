@@ -131,6 +131,118 @@ PlainCodeGenerationTest >> testInnerTemporary [
 	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
+{ #category : #'tests-messages' }
+PlainCodeGenerationTest >> testInnerUnarySelectorChangeWithOuterKeywordMessage [
+	| k initialBlock modifiedBlock b |
+	"The variable is instanciated with a value, it should therefore be replaced"
+	k := #aSelector.
+	initialBlock:=[ ^ 1 k a: b ].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: k isNotNil.
+	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'a:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'b' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'k' in: modifiedBlock) equals: 0.	
+	self assert: (self countID: #aSelector in: modifiedBlock) equals: 1.
+	self assert: (self countID:'a:' in: modifiedBlock) equals: 1.
+	self assert: (self countID:'b' in: modifiedBlock) equals: 1.
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+]
+
+{ #category : #'tests-messages' }
+PlainCodeGenerationTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithArrayArgumentReplaced [
+	| k initialBlock modifiedBlock b |
+	"The variable is instanciated with a value, it should therefore be replaced"
+	k := #aSelector.
+	b := 'druss'.
+	initialBlock:=[ ^ 1 k a: {b} ].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: k isNotNil.
+	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'a:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'b' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'k' in: modifiedBlock) equals: 0.
+	self assert: (self countID:'b' in: modifiedBlock) equals: 0.
+	self assert: (self countID: #aSelector in: modifiedBlock) equals: 1.
+	self assert: (self countID:'a:' in: modifiedBlock) equals: 1.
+	self assert: (self countID:'druss' in: modifiedBlock) equals: 1.
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+]
+
+{ #category : #'tests-messages' }
+PlainCodeGenerationTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithArrayArgumentSameAsSelector [
+	| k initialBlock modifiedBlock |
+	"The variable is instanciated with a value, it should therefore be replaced"
+	k := #aSelector.
+	initialBlock:=[ ^ 1 k a: {k} ].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: k isNotNil.
+	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 2.
+	self assert: (self countID:'a:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'k' in: modifiedBlock) equals: 0.
+	self assert: (self countID: #aSelector in: modifiedBlock) equals: 2.
+	self assert: (self countID:'a:' in: modifiedBlock) equals: 1.
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+]
+
+{ #category : #'tests-messages' }
+PlainCodeGenerationTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithArrayArgumentUnreplaced [
+	| k initialBlock modifiedBlock b |
+	"The variable is instanciated with a value, it should therefore be replaced"
+	k := #aSelector.
+	initialBlock:=[ ^ 1 k a: {b} ].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: k isNotNil.
+	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'a:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'b' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'k' in: modifiedBlock) equals: 0.	
+	self assert: (self countID: #aSelector in: modifiedBlock) equals: 1.
+	self assert: (self countID:'a:' in: modifiedBlock) equals: 1.
+	self assert: (self countID:'b' in: modifiedBlock) equals: 1.
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+]
+
+{ #category : #'tests-messages' }
+PlainCodeGenerationTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithSimpleArgument [
+	| k initialBlock modifiedBlock b |
+	"The variable is instanciated with a value, it should therefore be replaced"
+	k := #aSelector.
+	initialBlock:=[ ^ 1 k a: b ].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: k isNotNil.
+	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'a:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'b' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'k' in: modifiedBlock) equals: 0.	
+	self assert: (self countID: #aSelector in: modifiedBlock) equals: 1.
+	self assert: (self countID:'a:' in: modifiedBlock) equals: 1.
+	self assert: (self countID:'b' in: modifiedBlock) equals: 1.
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+]
+
+{ #category : #'tests-messages' }
+PlainCodeGenerationTest >> testInnerUnarySelectorChangeWithUnaryOuterNode [
+	| k initialBlock modifiedBlock|
+	"The variable is instanciated with a value, it should therefore be replaced"
+	k := #aSelector.
+	initialBlock:=[ ^ 1 k a ].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: k isNotNil.
+	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'k' in: modifiedBlock) equals: 0.	
+	self assert: (self countID: #aSelector in: modifiedBlock) equals: 1.
+	self assert: (self countID:'a' in: modifiedBlock) equals: 1.
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+]
+
 { #category : #'tests-variables' }
 PlainCodeGenerationTest >> testInstanceVariableSet [
 	| initialBlock modifiedBlock |
@@ -220,6 +332,23 @@ PlainCodeGenerationTest >> testKeywordMessageWithTempSet [
 	
 	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 	
+]
+
+{ #category : #'tests-messages' }
+PlainCodeGenerationTest >> testOuterUnarySelectorChange [
+	| k initialBlock modifiedBlock|
+	"The variable is instanciated with a value, it should therefore be replaced"
+	k := #aSelector.
+	initialBlock:=[ ^ 1 a k ].
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: k isNotNil.
+	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'k' in: modifiedBlock) equals: 0.	
+	self assert: (self countID: #aSelector in: modifiedBlock) equals: 1.
+	self assert: (self countID:'a' in: modifiedBlock) equals: 1.
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
 { #category : #'tests-mixte' }

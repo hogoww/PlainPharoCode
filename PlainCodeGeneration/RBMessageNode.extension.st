@@ -4,7 +4,7 @@ Extension { #name : #RBMessageNode }
 RBMessageNode >> innerMostMessage [
 	^self receiver isMessage 
 		ifTrue:[
-				self innerMostMessage
+				self receiver innerMostMessage
 			]
 		ifFalse:[
 				self

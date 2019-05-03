@@ -2,7 +2,6 @@ Class {
 	#name : #RBIDCounterVisitor,
 	#superclass : #RBProgramNodeVisitor,
 	#instVars : [
-		'name',
 		'count',
 		'anID'
 	],
@@ -26,7 +25,7 @@ RBIDCounterVisitor >> count [
 
 { #category : #initialization }
 RBIDCounterVisitor >> initialize [
-	count:=0.
+	count:=0
 ]
 
 { #category : #visiting }
