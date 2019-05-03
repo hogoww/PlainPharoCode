@@ -21,7 +21,7 @@ RBMessageNode >> isInnerMessage [
 RBMessageNode >> outerMostMessageNode [
 	^self isInnerMessage
 		ifTrue:[
-			^parent outerMostMessage.
+			^parent outerMostMessageNode.
 			]
 		ifFalse:[
 			^self

@@ -19,15 +19,21 @@ CodeGenerationVisitor >> context: aContext [
 ]
 
 { #category : #visiting }
-CodeGenerationVisitor >> getReplacementName: aString [
-	| isMethodSelector newName |
-	isMethodSelector := aString endsWith: ':'.
+CodeGenerationVisitor >> getMessageSelector: aString [
+	| newName resolvedName |
 	newName:=aString withoutSuffix: ':'.
-	(context lookupSymbol: newName)
+	resolvedName := self getReplacementName: newName.
+	^newName == resolvedName 
+	ifTrue:[ aString ] ifFalse:[ resolvedName ]
+]
+
+{ #category : #visiting }
+CodeGenerationVisitor >> getReplacementName: aString [
+	(context lookupSymbol: aString)
 	ifNotNil:[:value| 
 		^value asString
 		].
-	^isMethodSelector ifTrue:[ newName , ':'] ifFalse:[ newName].
+	^ aString.
 ]
 
 { #category : #accessing }
@@ -59,9 +65,9 @@ CodeGenerationVisitor >> visitMessageNode: aMessageNode [
 
 	aMessageNode parent replaceNode: aMessageNode 
 		withNode: (RBMessageNode receiver: aMessageNode receiver
-			selector: (self getReplacementName: (aMessageNode selector))
+			selector: (self getMessageSelector: (aMessageNode selector))
 			arguments: ([| args |
-				(self getReplacementName: (aMessageNode selector)) = aMessageNode selector
+				(self getMessageSelector: (aMessageNode selector)) = aMessageNode selector
 				ifTrue:[aMessageNode arguments]
 				ifFalse:[
 					args:=aMessageNode arguments ifNotEmpty:[:argus| argus at:1] ifEmpty:[ OrderedCollection new].
