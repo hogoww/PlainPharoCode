@@ -30,10 +30,11 @@ CodeGenerationVisitor >> getMessageSelector: aString [
 { #category : #visiting }
 CodeGenerationVisitor >> getReplacementName: aString [
 	(context lookupSymbol: aString)
-	ifNotNil:[:value| 
-		^value asString
-		].
-	^ aString.
+		ifNotNil: [ :value | 
+			value isArray
+				ifTrue: [ ^ value ]
+				ifFalse: [ ^ value asString ] ].
+	^ aString
 ]
 
 { #category : #accessing }
@@ -46,10 +47,44 @@ CodeGenerationVisitor >> initialMethod: aMethodNode [
 	^initialMethod := aMethodNode
 ]
 
+{ #category : #expand }
+CodeGenerationVisitor >> message: aMessageNode expandInMultipleSelectors: aCollectionOfSelector [ 
+	| newArguments replacementNodes oom |
+	oom := aMessageNode outerMostMessageNode.
+	
+	oom parent isReturn ifTrue:[ ExpandReturnError signal ].
+	
+	newArguments:=aMessageNode arguments
+		ifNotEmpty:[:args| args at:1 ] "we take the ArrayNode's collection directly"
+		ifEmpty:[ OrderedCollection new ]. 
+	newArguments size > 0 ifTrue:[ newArguments := newArguments statements].
+
+	replacementNodes:=	aCollectionOfSelector collect:[:aSelector| 
+			RBMessageNode receiver: aMessageNode receiver
+				selector: aSelector
+				arguments: newArguments
+			].
+	oom parent replaceNode:oom withNodes: replacementNodes.
+]
+
+{ #category : #'As yet unclassified' }
+CodeGenerationVisitor >> message: aMessageNode withNewSelector: newSelector [
+	| newArguments replacementNodes |
+	newArguments:=aMessageNode arguments 
+		ifNotEmpty:[:args| args at:1 ] "we take the ArrayNode's collection directly"
+		ifEmpty:[ OrderedCollection new ]. 
+	newArguments size > 0 ifTrue:[ newArguments := newArguments statements].
+
+	replacementNodes:=	RBMessageNode receiver: aMessageNode receiver
+				selector: newSelector
+				arguments: newArguments.
+	
+	aMessageNode parent replaceNode:aMessageNode withNode: replacementNodes.
+]
+
 { #category : #visiting }
 CodeGenerationVisitor >> variableExpandsInArrayNode: anArrayNode [
 	| omm res |
-
 	(anArrayNode parent isMessage and:[ anArrayNode parent receiver = anArrayNode ])
 	ifFalse:[^self].
 	omm:=anArrayNode parent outerMostMessageNode.
@@ -63,24 +98,16 @@ CodeGenerationVisitor >> variableExpandsInArrayNode: anArrayNode [
 
 { #category : #visiting }
 CodeGenerationVisitor >> visitMessageNode: aMessageNode [
-	| replacementNodes  newSelector newArguments |
+	| newSelector |
 	super visitMessageNode:aMessageNode.
 	
 	newSelector:=self getMessageSelector:aMessageNode selector.
 	newSelector = aMessageNode selector
 	ifTrue:[^self]. "Nothing to change here !"
 	
-	newArguments:=aMessageNode arguments 
-		ifNotEmpty:[:args| args at:1 ] "we take the ArrayNode's collection directly"
-		ifEmpty:[ OrderedCollection new ]. 
-	newArguments size > 0 ifTrue:[ newArguments := newArguments statements].
-
-	replacementNodes:=RBMessageNode receiver: aMessageNode receiver
-			selector: newSelector
-			arguments: newArguments.
-	
-	
-	aMessageNode parent replaceNode:aMessageNode withNode: replacementNodes.
+	newSelector isArray
+	ifFalse:[ self message: aMessageNode withNewSelector: newSelector.] 
+	ifTrue:[ self message: aMessageNode expandInMultipleSelectors: newSelector].
 ]
 
 { #category : #visiting }
@@ -89,9 +116,7 @@ CodeGenerationVisitor >> visitVariableNode: aVariableNode [
 	super visitVariableNode: aVariableNode.
 	
 	resolvedVariable := context lookupSymbol: aVariableNode name.
-
 	resolvedVariable isArray
 		ifTrue: [ self variableExpandsInArrayNode: aVariableNode ]
-		ifFalse:
-			[ aVariableNode name: (self getReplacementName: aVariableNode name) ]
+		ifFalse: [ aVariableNode name: (self getReplacementName: aVariableNode name) ]
 ]

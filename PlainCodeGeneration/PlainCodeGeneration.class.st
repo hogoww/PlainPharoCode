@@ -7,7 +7,7 @@ Class {
 	#category : #'PlainCodeGeneration-format'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #formatting }
 PlainCodeGeneration >> aCodeGeneratorFromBlock:aBlock [ 
 	| visitor ast |
 	visitor:=CodeGenerationVisitor new
@@ -19,38 +19,7 @@ PlainCodeGeneration >> aCodeGeneratorFromBlock:aBlock [
 	^ast
 ]
 
-{ #category : #'as yet unclassified' }
-PlainCodeGeneration >> aMethodThatGenerateCode: anArg [
-	| a n c d b u n2 |
-	a:=3.
-	c:='truc'.
-	a:=6.
-	d:= { #a . #c }.
-	u:= #aMessage.
-	b:= #-.
-	n:= #aMessageWith:.
-	n2:= #aMessage:with:.
-	^PlainCodeGeneration new generateCode: #myMethodSelector:withArg: withBody:[:g :anotherAnotherArg |
-		something n2:{ n . c }.
-		d aMes1 b:{ d }.
-		d n:{ a }.
-		d u.
-		d aMes.
-		c ifTrue:[ anArg. b:=3. ].
-		^a.
-		].
-
-]
-
 { #category : #formatting }
-PlainCodeGeneration >> formatSelector: aSymbol withArguments: aCollection [ 
-	^RBMethodNode new 
-		selector: aSymbol;
-		arguments: aCollection;
-		asString
-]
-
-{ #category : #'as yet unclassified' }
 PlainCodeGeneration >> generateCode: aSelector withBody: aBlock [
 	| updatedBlock |
 
