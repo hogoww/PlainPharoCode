@@ -9,7 +9,7 @@ I represent the tests for PlainCodeVisitor
 
 "
 Class {
-	#name : #PlainCodeGenerationTest,
+	#name : #PlainCodeVisitorTest,
 	#superclass : #TestCase,
 	#instVars : [
 		'anInstanceVariable',
@@ -20,7 +20,7 @@ Class {
 }
 
 { #category : #'tests-variables' }
-PlainCodeGenerationTest >> aTestExternargumentSet:anArg [
+PlainCodeVisitorTest >> aTestExternargumentSet:anArg [
 	| initialBlock modifiedBlock|
 	initialBlock:=[ ^ anArg ].
 	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
@@ -33,7 +33,7 @@ PlainCodeGenerationTest >> aTestExternargumentSet:anArg [
 ]
 
 { #category : #'tests-variables' }
-PlainCodeGenerationTest >> aTestExternargumentUnSet:anArg [
+PlainCodeVisitorTest >> aTestExternargumentUnSet:anArg [
 	| initialBlock modifiedBlock|
 	initialBlock:=[ ^ anArg ].
 	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
@@ -45,7 +45,7 @@ PlainCodeGenerationTest >> aTestExternargumentUnSet:anArg [
 ]
 
 { #category : #running }
-PlainCodeGenerationTest >> countID: anID in: aNode [
+PlainCodeVisitorTest >> countID: anID in: aNode [
 	| visitor |
 	visitor:= RBIDCounterVisitor new 
 		anID: anID;
@@ -55,14 +55,14 @@ PlainCodeGenerationTest >> countID: anID in: aNode [
 ]
 
 { #category : #running }
-PlainCodeGenerationTest >> setUp [
+PlainCodeVisitorTest >> setUp [
 	"Hooks that subclasses may override to define the fixture of test."
 	parser := RBParser.
 	plainCode := PlainCodeVisitor new.
 ]
 
 { #category : #'tests-messages' }
-PlainCodeGenerationTest >> testBinarySelectors [
+PlainCodeVisitorTest >> testBinarySelectors [
 	| b initialBlock modifiedBlock|
 	"The variable is instanciated with a value, it should therefore be replaced"
 	b := #- .
@@ -77,7 +77,7 @@ PlainCodeGenerationTest >> testBinarySelectors [
 ]
 
 { #category : #'test-message-expand' }
-PlainCodeGenerationTest >> testExpandInReturnOneUnary [
+PlainCodeVisitorTest >> testExpandInReturnOneUnary [
 	| u initialBlock |
 	"The variable is instanciated with a value, it should therefore be replaced"
 	u := { #truc . #truc2 }.
@@ -86,7 +86,7 @@ PlainCodeGenerationTest >> testExpandInReturnOneUnary [
 ]
 
 { #category : #'test-message-expand' }
-PlainCodeGenerationTest >> testExpandInReturnTwoUnary [
+PlainCodeVisitorTest >> testExpandInReturnTwoUnary [
 	| u initialBlock |
 	"The variable is instanciated with a value, it should therefore be replaced"
 	u := { #truc . #truc2 }.
@@ -95,17 +95,17 @@ PlainCodeGenerationTest >> testExpandInReturnTwoUnary [
 ]
 
 { #category : #'tests-variables' }
-PlainCodeGenerationTest >> testExternArgumentSet [
+PlainCodeVisitorTest >> testExternArgumentSet [
 	self aTestExternargumentSet: 'truc'.
 ]
 
 { #category : #'tests-variables' }
-PlainCodeGenerationTest >> testExternArgumentUnSet [
+PlainCodeVisitorTest >> testExternArgumentUnSet [
 	self aTestExternargumentUnSet: nil.
 ]
 
 { #category : #'tests-variables' }
-PlainCodeGenerationTest >> testExternTemporarySet [
+PlainCodeVisitorTest >> testExternTemporarySet [
 	| t initialBlock modifiedBlock|
 	"The variable is instanciated with a value, it should therefore be replaced"
 	t := 'truc'.
@@ -122,7 +122,7 @@ PlainCodeGenerationTest >> testExternTemporarySet [
 ]
 
 { #category : #'tests-variables' }
-PlainCodeGenerationTest >> testExternTemporaryUnset [
+PlainCodeVisitorTest >> testExternTemporaryUnset [
 	| t initialBlock modifiedBlock|
 	"There should be no replacement if the block's outer environment's variable equals nil"
 	initialBlock:=[ ^ t ].
@@ -136,7 +136,7 @@ PlainCodeGenerationTest >> testExternTemporaryUnset [
 ]
 
 { #category : #'tests-variables' }
-PlainCodeGenerationTest >> testInnerArgument [
+PlainCodeVisitorTest >> testInnerArgument [
 	| initialBlock modifiedBlock |
 	"Nothing in the outer environnement, nothing changes"
 	initialBlock:=[:anArg | ^ anArg ].
@@ -149,7 +149,7 @@ PlainCodeGenerationTest >> testInnerArgument [
 ]
 
 { #category : #'test-message-expand' }
-PlainCodeGenerationTest >> testInnerReplaceOneTernaryKeywordSelectorByTwoTernaryKeywordSelectors [
+PlainCodeVisitorTest >> testInnerReplaceOneTernaryKeywordSelectorByTwoTernaryKeywordSelectors [
 	| initialBlock modifiedBlock k |
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := { #truc: . #truc2: }.
@@ -165,7 +165,7 @@ PlainCodeGenerationTest >> testInnerReplaceOneTernaryKeywordSelectorByTwoTernary
 ]
 
 { #category : #'tests-variables' }
-PlainCodeGenerationTest >> testInnerTemporary [
+PlainCodeVisitorTest >> testInnerTemporary [
 	| initialBlock modifiedBlock|
 	"The outerContext doesn't affect the inner conntext, so nothing should move."
 	initialBlock:=[ |t| ^ t ].
@@ -178,7 +178,7 @@ PlainCodeGenerationTest >> testInnerTemporary [
 ]
 
 { #category : #'tests-messages' }
-PlainCodeGenerationTest >> testInnerUnarySelectorChangeWithOuterKeywordMessage [
+PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithOuterKeywordMessage [
 	| k initialBlock modifiedBlock b |
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector.
@@ -197,7 +197,7 @@ PlainCodeGenerationTest >> testInnerUnarySelectorChangeWithOuterKeywordMessage [
 ]
 
 { #category : #'tests-messages' }
-PlainCodeGenerationTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithArrayArgumentReplaced [
+PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithArrayArgumentReplaced [
 	| k initialBlock modifiedBlock b |
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector.
@@ -218,7 +218,7 @@ PlainCodeGenerationTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWi
 ]
 
 { #category : #'tests-messages' }
-PlainCodeGenerationTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithArrayArgumentSameAsSelector [
+PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithArrayArgumentSameAsSelector [
 	| k initialBlock modifiedBlock |
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector.
@@ -235,7 +235,7 @@ PlainCodeGenerationTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWi
 ]
 
 { #category : #'tests-messages' }
-PlainCodeGenerationTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithArrayArgumentUnreplaced [
+PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithArrayArgumentUnreplaced [
 	| k initialBlock modifiedBlock b |
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector.
@@ -254,7 +254,7 @@ PlainCodeGenerationTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWi
 ]
 
 { #category : #'tests-messages' }
-PlainCodeGenerationTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithSimpleArgument [
+PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithSimpleArgument [
 	| k initialBlock modifiedBlock b |
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector.
@@ -273,7 +273,7 @@ PlainCodeGenerationTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWi
 ]
 
 { #category : #'tests-messages' }
-PlainCodeGenerationTest >> testInnerUnarySelectorChangeWithUnaryOuterNode [
+PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithUnaryOuterNode [
 	| k initialBlock modifiedBlock|
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector.
@@ -290,7 +290,7 @@ PlainCodeGenerationTest >> testInnerUnarySelectorChangeWithUnaryOuterNode [
 ]
 
 { #category : #'tests-variables' }
-PlainCodeGenerationTest >> testInstanceVariableSet [
+PlainCodeVisitorTest >> testInstanceVariableSet [
 	| initialBlock modifiedBlock |
 	"The instance variable is set, therefore should be replaced in the block"
 	
@@ -309,7 +309,7 @@ PlainCodeGenerationTest >> testInstanceVariableSet [
 ]
 
 { #category : #'tests-variables' }
-PlainCodeGenerationTest >> testInstanceVariableUnset [
+PlainCodeVisitorTest >> testInstanceVariableUnset [
 	| initialBlock modifiedBlock |
 	"The instanceVariable is set to nil, so it shouldn't replace anything"
 	
@@ -326,7 +326,7 @@ PlainCodeGenerationTest >> testInstanceVariableUnset [
 ]
 
 { #category : #'tests-messages' }
-PlainCodeGenerationTest >> testKeywordMessageOneArg [
+PlainCodeVisitorTest >> testKeywordMessageOneArg [
 	| k initialBlock modifiedBlock|
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector:.
@@ -342,7 +342,7 @@ PlainCodeGenerationTest >> testKeywordMessageOneArg [
 ]
 
 { #category : #'tests-messages' }
-PlainCodeGenerationTest >> testKeywordMessageTwoArgs [
+PlainCodeVisitorTest >> testKeywordMessageTwoArgs [
 	| k initialBlock modifiedBlock|
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector:withAnotherArg:.
@@ -358,7 +358,7 @@ PlainCodeGenerationTest >> testKeywordMessageTwoArgs [
 ]
 
 { #category : #'tests-mixte' }
-PlainCodeGenerationTest >> testKeywordMessageWithTempSet [
+PlainCodeVisitorTest >> testKeywordMessageWithTempSet [
 	| k initialBlock modifiedBlock t |
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector:.
@@ -381,7 +381,7 @@ PlainCodeGenerationTest >> testKeywordMessageWithTempSet [
 ]
 
 { #category : #'tests-messages' }
-PlainCodeGenerationTest >> testOuterUnarySelectorChange [
+PlainCodeVisitorTest >> testOuterUnarySelectorChange [
 	| k initialBlock modifiedBlock|
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector.
@@ -398,7 +398,7 @@ PlainCodeGenerationTest >> testOuterUnarySelectorChange [
 ]
 
 { #category : #'tests-variables' }
-PlainCodeGenerationTest >> testReplaceInnerArgumentWithSetValue [
+PlainCodeVisitorTest >> testReplaceInnerArgumentWithSetValue [
 	| initialBlock modifiedBlock anotherArg argReplacement |
 	"The instanceVariable is set to nil, so it shouldn't replace anything"
 	
@@ -417,7 +417,7 @@ PlainCodeGenerationTest >> testReplaceInnerArgumentWithSetValue [
 ]
 
 { #category : #'tests-variables' }
-PlainCodeGenerationTest >> testReplaceInnerArgumentWithUnsetValue [
+PlainCodeVisitorTest >> testReplaceInnerArgumentWithUnsetValue [
 	| initialBlock modifiedBlock anotherArg argReplacement |
 	"The instanceVariable is set to nil, so it shouldn't replace anything"
 	
@@ -436,7 +436,7 @@ PlainCodeGenerationTest >> testReplaceInnerArgumentWithUnsetValue [
 ]
 
 { #category : #'test-message-expand' }
-PlainCodeGenerationTest >> testReplaceOneBinaryKeywordSelectorByTwoBinaryKeywordSelectors [
+PlainCodeVisitorTest >> testReplaceOneBinaryKeywordSelectorByTwoBinaryKeywordSelectors [
 	| initialBlock modifiedBlock k |
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := { #truc:truc: . #truc2:truc2: }.
@@ -452,7 +452,7 @@ PlainCodeGenerationTest >> testReplaceOneBinaryKeywordSelectorByTwoBinaryKeyword
 ]
 
 { #category : #'test-message-expand' }
-PlainCodeGenerationTest >> testReplaceOneBinarySelectorByTwoBinarySelectors [
+PlainCodeVisitorTest >> testReplaceOneBinarySelectorByTwoBinarySelectors [
 	| initialBlock modifiedBlock k |
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := { #- . #+ }.
@@ -468,7 +468,7 @@ PlainCodeGenerationTest >> testReplaceOneBinarySelectorByTwoBinarySelectors [
 ]
 
 { #category : #'test-message-expand' }
-PlainCodeGenerationTest >> testReplaceOneKeywordSelectorByTwoKeywordSelectors [
+PlainCodeVisitorTest >> testReplaceOneKeywordSelectorByTwoKeywordSelectors [
 	| u initialBlock modifiedBlock|
 	"The variable is instanciated with a value, it should therefore be replaced"
 	u := { #truc: . #truc2: }.
@@ -484,7 +484,7 @@ PlainCodeGenerationTest >> testReplaceOneKeywordSelectorByTwoKeywordSelectors [
 ]
 
 { #category : #'test-message-expand' }
-PlainCodeGenerationTest >> testReplaceOneTernaryKeywordSelectorByTwoTernaryKeywordSelectors [
+PlainCodeVisitorTest >> testReplaceOneTernaryKeywordSelectorByTwoTernaryKeywordSelectors [
 	| initialBlock modifiedBlock k |
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := { #truc:truc:truc: . #truc2:truc2:truc2: }.
@@ -500,7 +500,7 @@ PlainCodeGenerationTest >> testReplaceOneTernaryKeywordSelectorByTwoTernaryKeywo
 ]
 
 { #category : #'test-message-expand' }
-PlainCodeGenerationTest >> testReplaceOneUnaryKeywordSelectorByTwoUnaryKeywordSelectors [
+PlainCodeVisitorTest >> testReplaceOneUnaryKeywordSelectorByTwoUnaryKeywordSelectors [
 	| initialBlock modifiedBlock k |
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := { #truc: . #truc2: }.
@@ -516,7 +516,7 @@ PlainCodeGenerationTest >> testReplaceOneUnaryKeywordSelectorByTwoUnaryKeywordSe
 ]
 
 { #category : #'test-message-expand' }
-PlainCodeGenerationTest >> testReplaceOneUnarySelectorByTwoUnarySelectors [
+PlainCodeVisitorTest >> testReplaceOneUnarySelectorByTwoUnarySelectors [
 	| u initialBlock modifiedBlock|
 	"The variable is instanciated with a value, it should therefore be replaced"
 	u := { #truc . #truc2 }.
@@ -532,7 +532,7 @@ PlainCodeGenerationTest >> testReplaceOneUnarySelectorByTwoUnarySelectors [
 ]
 
 { #category : #'tests-mixte' }
-PlainCodeGenerationTest >> testTempSetOnSelectorAndVariable [
+PlainCodeVisitorTest >> testTempSetOnSelectorAndVariable [
 	| initialBlock modifiedBlock t |
 	"The variable is instanciated with a value, it should therefore be replaced"
 	t := 'aValue'.
@@ -547,7 +547,7 @@ PlainCodeGenerationTest >> testTempSetOnSelectorAndVariable [
 ]
 
 { #category : #'tests-mixte' }
-PlainCodeGenerationTest >> testTempUnsetOnSelectorAndVariable [
+PlainCodeVisitorTest >> testTempUnsetOnSelectorAndVariable [
 	| initialBlock modifiedBlock t |
 	"The variable is instanciated with a value, it should therefore be replaced"
 	t := nil.
@@ -561,7 +561,7 @@ PlainCodeGenerationTest >> testTempUnsetOnSelectorAndVariable [
 ]
 
 { #category : #'test-variable-expand' }
-PlainCodeGenerationTest >> testTryExpandOnAReturn [
+PlainCodeVisitorTest >> testTryExpandOnAReturn [
 	| initialBlock a |
 	"Cannot expand an array on a return, it would give the following code:
 	^druss
@@ -575,7 +575,7 @@ PlainCodeGenerationTest >> testTryExpandOnAReturn [
 ]
 
 { #category : #'tests-messages' }
-PlainCodeGenerationTest >> testUnarySelector [
+PlainCodeVisitorTest >> testUnarySelector [
 	| u initialBlock modifiedBlock|
 	"The variable is instanciated with a value, it should therefore be replaced"
 	u := #truc.
@@ -590,7 +590,7 @@ PlainCodeGenerationTest >> testUnarySelector [
 ]
 
 { #category : #'tests-messages' }
-PlainCodeGenerationTest >> testUnarySelectorWithEmptyArguments [
+PlainCodeVisitorTest >> testUnarySelectorWithEmptyArguments [
 	| u initialBlock modifiedBlock|
 	"The variable is instanciated with a value, it should therefore be replaced"
 	u := #truc.
@@ -605,7 +605,7 @@ PlainCodeGenerationTest >> testUnarySelectorWithEmptyArguments [
 ]
 
 { #category : #'test-variable-expand' }
-PlainCodeGenerationTest >> testVariableNodeIsArray [
+PlainCodeVisitorTest >> testVariableNodeIsArray [
 	| initialBlock modifiedBlock a |
 	"The instanceVariable is set to nil, so it shouldn't replace anything"
 	

@@ -51,11 +51,6 @@ PlainCodeVisitor >> argumentDictionary: aDictionary [
 	^argumentDictionary:= aDictionary
 ]
 
-{ #category : #constraint }
-PlainCodeVisitor >> constrainCheckFor: aBlockClosure [ 
-	self shouldBeImplemented.
-]
-
 { #category : #accessing }
 PlainCodeVisitor >> context [ 
 	^context
@@ -125,7 +120,7 @@ PlainCodeVisitor >> message: aMessageNode expandInMultipleSelectors: aCollection
 	oom parent replaceNode:oom withNodes: replacementNodes.
 ]
 
-{ #category : #'As yet unclassified' }
+{ #category : #visiting }
 PlainCodeVisitor >> message: aMessageNode withNewSelector: newSelector [
 	| newArguments replacementNodes |
 	newArguments:=aMessageNode arguments 
@@ -140,7 +135,7 @@ PlainCodeVisitor >> message: aMessageNode withNewSelector: newSelector [
 	aMessageNode parent replaceNode:aMessageNode withNode: replacementNodes.
 ]
 
-{ #category : #visiting }
+{ #category : #expand }
 PlainCodeVisitor >> variableExpandsInArrayNode: anArrayNode [
 	| omm res |
 	(anArrayNode parent isMessage and:[ anArrayNode parent receiver = anArrayNode ])
