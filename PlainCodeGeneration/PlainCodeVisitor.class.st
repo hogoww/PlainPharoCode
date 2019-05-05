@@ -1,36 +1,93 @@
+"
+I represent a Visitor that allow to write pharo code which will be formated and returns an Abstract Syntax Tree.
+
+I use the context in which a block is define to replace every variable that has a value with the value.
+
+Public API and Key Messages
+
+- generateCode: aSelector WithBody: aBlock >> generate the code of the method with the Selector, with aBlock as a body.
+- generateCode: aSelector WithBody: aBlock andArguments: aCollection >> same thing, but will replace the block's arguments as well.
+
+/!\
+	We use the Stack's context.
+	Block can't be defined in other blocks, the outeContext won't work otherwise. If you need some control flow, you HAVE to use #ifTrue:ifFalse: or a variation, because it's inlined by the compiler.
+ 
+    Instance Variables
+	context: <Context> OuterContext of the block's argument.
+	argumentDictionary: <Dictionary> Dictionary containing the associations to replace the arguments of the block.
+
+Plenty of small examples are available in PlainCodeVisitorTest
+"
 Class {
-	#name : #CodeGenerationVisitor,
+	#name : #PlainCodeVisitor,
 	#superclass : #RBProgramNodeVisitor,
 	#instVars : [
 		'context',
-		'initialMethod',
 		'argumentDictionary'
 	],
 	#category : #'PlainCodeGeneration-format'
 }
 
+{ #category : #formatting }
+PlainCodeVisitor >> aCodeGeneratorFromBlock:aBlock andArguments: aDictionary [
+	| visitor ast |
+	visitor:=PlainCodeVisitor new
+		context:aBlock outerContext;
+		argumentDictionary: aDictionary;
+		yourself.
+	ast:=aBlock sourceNode copy. "Working on a copy, to not modify the defined ast"
+		
+	ast acceptVisitor: visitor.
+	^ast
+]
+
 { #category : #accessing }
-CodeGenerationVisitor >> argumentDictionary [
+PlainCodeVisitor >> argumentDictionary [
 	^argumentDictionary
 ]
 
 { #category : #accessing }
-CodeGenerationVisitor >> argumentDictionary: aDictionary [
+PlainCodeVisitor >> argumentDictionary: aDictionary [
 	^argumentDictionary:= aDictionary
 ]
 
+{ #category : #constraint }
+PlainCodeVisitor >> constrainCheckFor: aBlockClosure [ 
+	self shouldBeImplemented.
+]
+
 { #category : #accessing }
-CodeGenerationVisitor >> context [ 
+PlainCodeVisitor >> context [ 
 	^context
 ]
 
 { #category : #accessing }
-CodeGenerationVisitor >> context: aContext [
+PlainCodeVisitor >> context: aContext [
 	^context:=aContext
 ]
 
+{ #category : #formatting }
+PlainCodeVisitor >> generateCode: aSelector withBody: aBlock [
+	^ self
+		generateCode: aSelector
+		withBody: aBlock
+		andArguments: Dictionary new
+]
+
+{ #category : #formatting }
+PlainCodeVisitor >> generateCode: aSelector withBody: aBlock andArguments: aDictionnary [
+	| updatedBlock |
+
+	updatedBlock:=self aCodeGeneratorFromBlock:aBlock andArguments: aDictionnary.
+
+	^RBMethodNode
+		selector: aSelector
+		arguments: updatedBlock arguments
+		body: updatedBlock body.
+]
+
 { #category : #visiting }
-CodeGenerationVisitor >> getMessageSelector: aString [
+PlainCodeVisitor >> getMessageSelector: aString [
 	| newName resolvedName |
 	newName:=aString withoutSuffix: ':'.
 	resolvedName := self getReplacementName: newName.
@@ -39,7 +96,7 @@ CodeGenerationVisitor >> getMessageSelector: aString [
 ]
 
 { #category : #visiting }
-CodeGenerationVisitor >> getReplacementName: aString [
+PlainCodeVisitor >> getReplacementName: aString [
 	(context lookupSymbol: aString)
 		ifNotNil: [ :value | 
 			value isArray
@@ -48,18 +105,8 @@ CodeGenerationVisitor >> getReplacementName: aString [
 	^ aString
 ]
 
-{ #category : #accessing }
-CodeGenerationVisitor >> initialMethod [
-	^initialMethod
-]
-
-{ #category : #accessing }
-CodeGenerationVisitor >> initialMethod: aMethodNode [
-	^initialMethod := aMethodNode
-]
-
 { #category : #expand }
-CodeGenerationVisitor >> message: aMessageNode expandInMultipleSelectors: aCollectionOfSelector [ 
+PlainCodeVisitor >> message: aMessageNode expandInMultipleSelectors: aCollectionOfSelector [ 
 	| newArguments replacementNodes oom |
 	oom := aMessageNode outerMostMessageNode.
 	
@@ -79,7 +126,7 @@ CodeGenerationVisitor >> message: aMessageNode expandInMultipleSelectors: aColle
 ]
 
 { #category : #'As yet unclassified' }
-CodeGenerationVisitor >> message: aMessageNode withNewSelector: newSelector [
+PlainCodeVisitor >> message: aMessageNode withNewSelector: newSelector [
 	| newArguments replacementNodes |
 	newArguments:=aMessageNode arguments 
 		ifNotEmpty:[:args| args at:1 ] "we take the ArrayNode's collection directly"
@@ -94,7 +141,7 @@ CodeGenerationVisitor >> message: aMessageNode withNewSelector: newSelector [
 ]
 
 { #category : #visiting }
-CodeGenerationVisitor >> variableExpandsInArrayNode: anArrayNode [
+PlainCodeVisitor >> variableExpandsInArrayNode: anArrayNode [
 	| omm res |
 	(anArrayNode parent isMessage and:[ anArrayNode parent receiver = anArrayNode ])
 	ifFalse:[^self].
@@ -108,8 +155,11 @@ CodeGenerationVisitor >> variableExpandsInArrayNode: anArrayNode [
 ]
 
 { #category : #visiting }
-CodeGenerationVisitor >> visitArgumentNode: anArgumentNode [
+PlainCodeVisitor >> visitArgumentNode: anArgumentNode [
 	| replacementName |
+	"This will take care of the replacing the inner block's arguments
+	[:b| b ] with the dictionary containing 'b'->a and a:=c will output the method with the body [:c| c ]"
+
 	replacementName:=argumentDictionary at:anArgumentNode name ifAbsent:[
 		^self visitVariableNode: anArgumentNode.
 		].
@@ -120,8 +170,9 @@ CodeGenerationVisitor >> visitArgumentNode: anArgumentNode [
 ]
 
 { #category : #visiting }
-CodeGenerationVisitor >> visitMessageNode: aMessageNode [
+PlainCodeVisitor >> visitMessageNode: aMessageNode [
 	| newSelector |
+	"This will dispatch the message depending if we won't to replace it's selector by one or several messages"
 	super visitMessageNode:aMessageNode.
 	
 	newSelector:=self getMessageSelector:aMessageNode selector.
@@ -134,7 +185,7 @@ CodeGenerationVisitor >> visitMessageNode: aMessageNode [
 ]
 
 { #category : #visiting }
-CodeGenerationVisitor >> visitVariableNode: aVariableNode [
+PlainCodeVisitor >> visitVariableNode: aVariableNode [
 	| resolvedVariable |
 	super visitVariableNode: aVariableNode.
 	
