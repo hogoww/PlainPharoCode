@@ -3,10 +3,21 @@ Class {
 	#superclass : #RBProgramNodeVisitor,
 	#instVars : [
 		'context',
-		'initialMethod'
+		'initialMethod',
+		'argumentDictionary'
 	],
 	#category : #'PlainCodeGeneration-format'
 }
+
+{ #category : #accessing }
+CodeGenerationVisitor >> argumentDictionary [
+	^argumentDictionary
+]
+
+{ #category : #accessing }
+CodeGenerationVisitor >> argumentDictionary: aDictionary [
+	^argumentDictionary:= aDictionary
+]
 
 { #category : #accessing }
 CodeGenerationVisitor >> context [ 
@@ -94,6 +105,18 @@ CodeGenerationVisitor >> variableExpandsInArrayNode: anArrayNode [
 		omm copy innerMostMessage receiver: (RBVariableNode named:aStatement)
 		].
 	omm parent replaceNode: omm withNodes: res.
+]
+
+{ #category : #visiting }
+CodeGenerationVisitor >> visitArgumentNode: anArgumentNode [
+	| replacementName |
+	replacementName:=argumentDictionary at:anArgumentNode name ifAbsent:[
+		^self visitVariableNode: anArgumentNode.
+		].
+	replacementName ifNotNil:[
+		anArgumentNode name: replacementName.
+	]
+	
 ]
 
 { #category : #visiting }

@@ -385,6 +385,44 @@ PlainCodeGenerationTest >> testOuterUnarySelectorChange [
 	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
+{ #category : #'tests-variables' }
+PlainCodeGenerationTest >> testReplaceInnerArgumentWithSetValue [
+	| initialBlock modifiedBlock anotherArg argReplacement |
+	"The instanceVariable is set to nil, so it shouldn't replace anything"
+	
+	anotherArg:= 'something'.
+	
+	initialBlock := [:anArg|	^ anArg ].
+	argReplacement := Dictionary new add: 'anArg' -> anotherArg ; yourself.
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod: withBody: initialBlock andArguments: argReplacement.
+	
+	self assert: anotherArg isNotNil.
+	self assert: (self countID:'anArg' in: initialBlock sourceNode) equals: 2.
+	self assert: (self countID:'anArg' in: modifiedBlock) equals: 0.
+	self assert: (self countID:'something' in: modifiedBlock) equals: 2. 
+	
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+]
+
+{ #category : #'tests-variables' }
+PlainCodeGenerationTest >> testReplaceInnerArgumentWithUnsetValue [
+	| initialBlock modifiedBlock anotherArg argReplacement |
+	"The instanceVariable is set to nil, so it shouldn't replace anything"
+	
+	anotherArg := nil.
+	
+	initialBlock := [:anArg|	^ anArg ].
+	argReplacement := Dictionary new add: 'anArg' -> anotherArg ; yourself.
+	modifiedBlock := PlainCodeGeneration new generateCode: #aMethod: withBody: initialBlock andArguments: argReplacement.
+	
+	self assert: anotherArg isNil.
+	self assert: (self countID:'anArg' in: initialBlock sourceNode) equals: 2.
+	self assert: (self countID:'anArg' in: modifiedBlock) equals: 2.
+	self assert: (self countID:'something' in: modifiedBlock) equals: 0. 
+	
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+]
+
 { #category : #'test-message-expand' }
 PlainCodeGenerationTest >> testReplaceOneBinaryKeywordSelectorByTwoBinaryKeywordSelectors [
 	| initialBlock modifiedBlock k |
