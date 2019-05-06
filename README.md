@@ -9,4 +9,4 @@ We also (sadly) have to stringify the AST rather than giving it directly to the 
 
 ![Example #2](./images/ex2.png)
 
-![Example #3](./images/ex2.png)
+![Example #3](./images/ex3.png)
