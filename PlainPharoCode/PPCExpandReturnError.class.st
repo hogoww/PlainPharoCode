@@ -13,7 +13,7 @@ should be expanded as:
 which is not possible.
 "
 Class {
-	#name : #ExpandReturnError,
+	#name : #PPCExpandReturnError,
 	#superclass : #Error,
-	#category : #'PlainCodeGeneration-format'
+	#category : #'PlainPharoCode-format'
 }

@@ -19,19 +19,19 @@ Public API and Key Messages
 Plenty of small examples are available in PlainCodeVisitorTest
 "
 Class {
-	#name : #PlainCodeVisitor,
+	#name : #PPCPlainCodeVisitor,
 	#superclass : #RBProgramNodeVisitor,
 	#instVars : [
 		'context',
 		'argumentDictionary'
 	],
-	#category : #'PlainCodeGeneration-format'
+	#category : #'PlainPharoCode-format'
 }
 
 { #category : #formatting }
-PlainCodeVisitor >> aCodeGeneratorFromBlock:aBlock andArguments: aDictionary [
+PPCPlainCodeVisitor >> aCodeGeneratorFromBlock:aBlock andArguments: aDictionary [
 	| visitor ast |
-	visitor:=PlainCodeVisitor new
+	visitor:=PPCPlainCodeVisitor new
 		context:aBlock outerContext;
 		argumentDictionary: aDictionary;
 		yourself.
@@ -42,32 +42,27 @@ PlainCodeVisitor >> aCodeGeneratorFromBlock:aBlock andArguments: aDictionary [
 ]
 
 { #category : #accessing }
-PlainCodeVisitor >> argumentDictionary [
+PPCPlainCodeVisitor >> argumentDictionary [
 	^argumentDictionary
 ]
 
 { #category : #accessing }
-PlainCodeVisitor >> argumentDictionary: aDictionary [
+PPCPlainCodeVisitor >> argumentDictionary: aDictionary [
 	^argumentDictionary:= aDictionary
 ]
 
-{ #category : #constraint }
-PlainCodeVisitor >> constrainCheckFor: aBlockClosure [ 
-	self shouldBeImplemented.
-]
-
 { #category : #accessing }
-PlainCodeVisitor >> context [ 
+PPCPlainCodeVisitor >> context [ 
 	^context
 ]
 
 { #category : #accessing }
-PlainCodeVisitor >> context: aContext [
+PPCPlainCodeVisitor >> context: aContext [
 	^context:=aContext
 ]
 
 { #category : #formatting }
-PlainCodeVisitor >> generateCode: aSelector withBody: aBlock [
+PPCPlainCodeVisitor >> generateCode: aSelector withBody: aBlock [
 	^ self
 		generateCode: aSelector
 		withBody: aBlock
@@ -75,7 +70,7 @@ PlainCodeVisitor >> generateCode: aSelector withBody: aBlock [
 ]
 
 { #category : #formatting }
-PlainCodeVisitor >> generateCode: aSelector withBody: aBlock andArguments: aDictionnary [
+PPCPlainCodeVisitor >> generateCode: aSelector withBody: aBlock andArguments: aDictionnary [
 	| updatedBlock |
 
 	updatedBlock:=self aCodeGeneratorFromBlock:aBlock andArguments: aDictionnary.
@@ -87,7 +82,7 @@ PlainCodeVisitor >> generateCode: aSelector withBody: aBlock andArguments: aDict
 ]
 
 { #category : #visiting }
-PlainCodeVisitor >> getMessageSelector: aString [
+PPCPlainCodeVisitor >> getMessageSelector: aString [
 	| newName resolvedName |
 	newName:=aString withoutSuffix: ':'.
 	resolvedName := self getReplacementName: newName.
@@ -96,7 +91,7 @@ PlainCodeVisitor >> getMessageSelector: aString [
 ]
 
 { #category : #visiting }
-PlainCodeVisitor >> getReplacementName: aString [
+PPCPlainCodeVisitor >> getReplacementName: aString [
 	(context lookupSymbol: aString)
 		ifNotNil: [ :value | 
 			value isArray
@@ -106,11 +101,11 @@ PlainCodeVisitor >> getReplacementName: aString [
 ]
 
 { #category : #expand }
-PlainCodeVisitor >> message: aMessageNode expandInMultipleSelectors: aCollectionOfSelector [ 
+PPCPlainCodeVisitor >> message: aMessageNode expandInMultipleSelectors: aCollectionOfSelector [ 
 	| newArguments replacementNodes oom |
 	oom := aMessageNode outerMostMessageNode.
 	
-	oom parent isReturn ifTrue:[ ExpandReturnError signal ].
+	oom parent isReturn ifTrue:[ PPCExpandReturnError signal ].
 	
 	newArguments:=aMessageNode arguments
 		ifNotEmpty:[:args| args at:1 ] "we take the ArrayNode's collection directly"
@@ -125,8 +120,8 @@ PlainCodeVisitor >> message: aMessageNode expandInMultipleSelectors: aCollection
 	oom parent replaceNode:oom withNodes: replacementNodes.
 ]
 
-{ #category : #'As yet unclassified' }
-PlainCodeVisitor >> message: aMessageNode withNewSelector: newSelector [
+{ #category : #visiting }
+PPCPlainCodeVisitor >> message: aMessageNode withNewSelector: newSelector [
 	| newArguments replacementNodes |
 	newArguments:=aMessageNode arguments 
 		ifNotEmpty:[:args| args at:1 ] "we take the ArrayNode's collection directly"
@@ -140,13 +135,13 @@ PlainCodeVisitor >> message: aMessageNode withNewSelector: newSelector [
 	aMessageNode parent replaceNode:aMessageNode withNode: replacementNodes.
 ]
 
-{ #category : #visiting }
-PlainCodeVisitor >> variableExpandsInArrayNode: anArrayNode [
+{ #category : #expand }
+PPCPlainCodeVisitor >> variableExpandsInArrayNode: anArrayNode [
 	| omm res |
 	(anArrayNode parent isMessage and:[ anArrayNode parent receiver = anArrayNode ])
 	ifFalse:[^self].
 	omm:=anArrayNode parent outerMostMessageNode.
-	omm parent isReturn ifTrue:[^ExpandReturnError new signal].
+	omm parent isReturn ifTrue:[^PPCExpandReturnError new signal].
 	
 	res:=(context lookupSymbol: anArrayNode name) collect:[:aStatement| 
 		omm copy innerMostMessage receiver: (RBVariableNode named:aStatement)
@@ -155,7 +150,7 @@ PlainCodeVisitor >> variableExpandsInArrayNode: anArrayNode [
 ]
 
 { #category : #visiting }
-PlainCodeVisitor >> visitArgumentNode: anArgumentNode [
+PPCPlainCodeVisitor >> visitArgumentNode: anArgumentNode [
 	| replacementName |
 	"This will take care of the replacing the inner block's arguments
 	[:b| b ] with the dictionary containing 'b'->a and a:=c will output the method with the body [:c| c ]"
@@ -170,7 +165,7 @@ PlainCodeVisitor >> visitArgumentNode: anArgumentNode [
 ]
 
 { #category : #visiting }
-PlainCodeVisitor >> visitMessageNode: aMessageNode [
+PPCPlainCodeVisitor >> visitMessageNode: aMessageNode [
 	| newSelector |
 	"This will dispatch the message depending if we won't to replace it's selector by one or several messages"
 	super visitMessageNode:aMessageNode.
@@ -185,7 +180,7 @@ PlainCodeVisitor >> visitMessageNode: aMessageNode [
 ]
 
 { #category : #visiting }
-PlainCodeVisitor >> visitVariableNode: aVariableNode [
+PPCPlainCodeVisitor >> visitVariableNode: aVariableNode [
 	| resolvedVariable |
 	super visitVariableNode: aVariableNode.
 	

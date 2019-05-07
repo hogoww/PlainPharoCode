@@ -19,44 +19,44 @@ visitor count >>> 2.
 
 "
 Class {
-	#name : #RBIDCounterVisitor,
+	#name : #PPCRBIDCounterVisitor,
 	#superclass : #RBProgramNodeVisitor,
 	#instVars : [
 		'count',
 		'anID'
 	],
-	#category : #'PlainCodeGeneration-tests'
+	#category : #'PlainPharoCode-tests'
 }
 
 { #category : #accessing }
-RBIDCounterVisitor >> anID [
+PPCRBIDCounterVisitor >> anID [
 	^ anID
 ]
 
 { #category : #accessing }
-RBIDCounterVisitor >> anID: aString [
+PPCRBIDCounterVisitor >> anID: aString [
 	^ anID := aString
 ]
 
 { #category : #accessing }
-RBIDCounterVisitor >> count [
+PPCRBIDCounterVisitor >> count [
 	^ count
 ]
 
 { #category : #initialization }
-RBIDCounterVisitor >> initialize [
+PPCRBIDCounterVisitor >> initialize [
 	count:=0
 ]
 
 { #category : #visiting }
-RBIDCounterVisitor >> visitMessageNode: aMessageNode [
+PPCRBIDCounterVisitor >> visitMessageNode: aMessageNode [
 	aMessageNode selector = anID
 		ifTrue: [ count := count + 1 ].
 	^ super visitMessageNode: aMessageNode
 ]
 
 { #category : #visiting }
-RBIDCounterVisitor >> visitVariableNode: aVariableNode [
+PPCRBIDCounterVisitor >> visitVariableNode: aVariableNode [
 	aVariableNode name = anID
 		ifTrue: [ count := count + 1 ].
 	^ super visitVariableNode: aVariableNode
