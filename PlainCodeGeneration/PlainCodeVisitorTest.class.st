@@ -380,6 +380,24 @@ PlainCodeVisitorTest >> testKeywordMessageWithTempSet [
 	
 ]
 
+{ #category : #'test-variable-expand' }
+PlainCodeVisitorTest >> testLeftSideAssignementVariableNodeExpand [
+	| initialBlock modifiedBlock a |
+	"Both value should be assigned with the right hand side"
+	
+	a:={ 'druss' . 'waylander' }.
+	
+	initialBlock := [	a:=#aMessage ].
+	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: a isArray.
+	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'druss' in: modifiedBlock) equals: 1.
+	self assert: (self countID:'waylander' in: modifiedBlock) equals: 1.
+	self assert: (self countID: #aMessage in: modifiedBlock) equals: 2.
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+]
+
 { #category : #'tests-messages' }
 PlainCodeVisitorTest >> testOuterUnarySelectorChange [
 	| k initialBlock modifiedBlock|
@@ -394,6 +412,25 @@ PlainCodeVisitorTest >> testOuterUnarySelectorChange [
 	self assert: (self countID:'k' in: modifiedBlock) equals: 0.	
 	self assert: (self countID: #aSelector in: modifiedBlock) equals: 1.
 	self assert: (self countID:'a' in: modifiedBlock) equals: 1.
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+]
+
+{ #category : #'test-variable-expand' }
+PlainCodeVisitorTest >> testReceiverVariableNodeExpand [
+	| initialBlock modifiedBlock a |
+	"The message should be send to both values of a individually"
+	
+	a:={ 'druss' . 'waylander' }.
+	
+	initialBlock := [	a aMessage ].
+	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: a isArray.
+	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'a' in: modifiedBlock) equals: 0.
+	self assert: (self countID:'druss' in: modifiedBlock) equals: 1.
+	self assert: (self countID:'waylander' in: modifiedBlock) equals: 1.
+	self assert: (self countID: #aMessage in: modifiedBlock) equals: 2.
 	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
@@ -601,23 +638,5 @@ PlainCodeVisitorTest >> testUnarySelectorWithEmptyArguments [
 	self assert: (self countID:'u:' in: initialBlock sourceNode) equals: 1.
 	self assert: (self countID:'u:' in: modifiedBlock) equals: 0.
 	self assert: (self countID:#truc in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
-]
-
-{ #category : #'test-variable-expand' }
-PlainCodeVisitorTest >> testVariableNodeIsArray [
-	| initialBlock modifiedBlock a |
-	"The instanceVariable is set to nil, so it shouldn't replace anything"
-	
-	a:={ 'druss' . 'waylander' }.
-	
-	initialBlock := [	a aMessage ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
-	
-	self assert: a isArray.
-	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'druss' in: modifiedBlock) equals: 1.
-	self assert: (self countID:'waylander' in: modifiedBlock) equals: 1.
-	self assert: (self countID: #aMessage in: modifiedBlock) equals: 2.
 	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]

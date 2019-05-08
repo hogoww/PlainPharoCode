@@ -49,6 +49,14 @@ RBIDCounterVisitor >> initialize [
 ]
 
 { #category : #visiting }
+RBIDCounterVisitor >> visitLiteralNode: aLiteralNode [
+	super visitLiteralNode:aLiteralNode.
+	aLiteralNode value=anID
+	ifTrue:[count :=count + 1].
+	
+]
+
+{ #category : #visiting }
 RBIDCounterVisitor >> visitMessageNode: aMessageNode [
 	aMessageNode selector = anID
 		ifTrue: [ count := count + 1 ].

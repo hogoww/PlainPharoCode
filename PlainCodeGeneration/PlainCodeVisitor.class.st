@@ -165,6 +165,23 @@ PlainCodeVisitor >> visitArgumentNode: anArgumentNode [
 ]
 
 { #category : #visiting }
+PlainCodeVisitor >> visitAssignmentNode: anAssignmentNode [
+	| resolvedName expandedNodes |
+	anAssignmentNode value acceptVisitor:self.
+	
+	resolvedName:=context lookupSymbol: anAssignmentNode variable name.
+	resolvedName isArray 
+	ifFalse:[^self].
+	expandedNodes:=resolvedName collect:[:aName| 
+		|node|
+		node:=anAssignmentNode copy.
+		node variable name: aName.
+		node.
+		].
+	anAssignmentNode parent replaceNode: anAssignmentNode withNodes: expandedNodes.
+]
+
+{ #category : #visiting }
 PlainCodeVisitor >> visitMessageNode: aMessageNode [
 	| newSelector |
 	"This will dispatch the message depending if we won't to replace it's selector by one or several messages"
