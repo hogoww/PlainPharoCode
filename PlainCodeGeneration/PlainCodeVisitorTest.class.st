@@ -63,11 +63,12 @@ PlainCodeVisitorTest >> setUp [
 
 { #category : #'tests-messages' }
 PlainCodeVisitorTest >> testBinarySelectors [
-	| b initialBlock modifiedBlock|
+	| b initialBlock modifiedBlock |
 	"The variable is instanciated with a value, it should therefore be replaced"
 	b := #- .
-	initialBlock:=[ ^ 1 b:{ 1} ].
+	initialBlock:=[ ^ 1 b:{ 1 } ].
 	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	"Expected: [^1-1 ]".
 	
 	self assert: b isNotNil.
 	self assert: (self countID:'b:' in: initialBlock sourceNode) equals: 1.
@@ -77,20 +78,12 @@ PlainCodeVisitorTest >> testBinarySelectors [
 ]
 
 { #category : #'test-message-expand' }
-PlainCodeVisitorTest >> testExpandInReturnOneUnary [
-	| u initialBlock |
-	"The variable is instanciated with a value, it should therefore be replaced"
-	u := { #truc . #truc2 }.
-	initialBlock:=[ ^ 1 u ].
-	self should:[ plainCode generateCode: #aMethod withBody: initialBlock ] raise:ExpandReturnError.
-]
-
-{ #category : #'test-message-expand' }
 PlainCodeVisitorTest >> testExpandInReturnTwoUnary [
 	| u initialBlock |
-	"The variable is instanciated with a value, it should therefore be replaced"
+	"The variable is instanciated with an array, it should therefore be expanded as two messages. But given that you can't have two return statement in a row, hence, it'll throw an error"
 	u := { #truc . #truc2 }.
-	initialBlock:=[ ^ 1 u b ].
+	initialBlock:=[ ^ 1 u ].
+	"Expected: [ 1 truc1. 1 truc2.] (if it didn't fail)"
 	self should:[ plainCode generateCode: #aMethod withBody: initialBlock ] raise:ExpandReturnError.
 ]
 
@@ -111,6 +104,7 @@ PlainCodeVisitorTest >> testExternTemporarySet [
 	t := 'truc'.
 	initialBlock:=[ ^ t ].
 	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	"Expected: [ ^truc ]"
 	
 	self assert: t isNotNil.
 	self assert: (self countID:'t' in: initialBlock sourceNode) equals: 1.
@@ -299,13 +293,17 @@ PlainCodeVisitorTest >> testInstanceVariableSet [
 	initialBlock := [	^ anInstanceVariable ].
 	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
 	
-	self assert: anInstanceVariable isNotNil.
-	self assert: (self countID:'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'anInstanceVariable' in: modifiedBlock) equals: 0. 
-	self assert: (self countID:'truc' in: modifiedBlock) equals: 1.
-	anInstanceVariable := nil.
+	[
+		self assert: anInstanceVariable isNotNil.
+		self assert: (self countID:'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
+		self assert: (self countID:'anInstanceVariable' in: modifiedBlock) equals: 0. 
+		self assert: (self countID:'truc' in: modifiedBlock) equals: 1.
+		self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	] ensure: [
+		anInstanceVariable := nil.
+	]
 	
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	
 ]
 
 { #category : #'tests-variables' }
@@ -565,6 +563,25 @@ PlainCodeVisitorTest >> testReplaceOneUnarySelectorByTwoUnarySelectors [
 	self assert: (self countID:'u' in: modifiedBlock) equals: 0.
 	self assert: (self countID:#truc in: modifiedBlock) equals: 1.
 	self assert: (self countID:#truc2 in: modifiedBlock) equals: 1.
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+]
+
+{ #category : #'test-variable-expand' }
+PlainCodeVisitorTest >> testRighSideAssignementVariableNodeExpand [
+	| initialBlock modifiedBlock a b |
+	"Both value should be assigned to the left hand side. I doubt it makes sense, but it should be possible"
+	
+	a:={ 'druss' . 'waylander' }.
+	
+	initialBlock := [	b:=a. ].
+	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: a isArray.
+	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 0.
+	self assert: (self countID:'druss' in: modifiedBlock) equals: 1.
+	self assert: (self countID:'waylander' in: modifiedBlock) equals: 1.
+	self assert: (self countID: #aMessage in: modifiedBlock) equals: 2.
 	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
