@@ -201,15 +201,14 @@ PlainCodeVisitor >> visitAssignmentNode: anAssignmentNode [
 PlainCodeVisitor >> visitMessageNode: aMessageNode [
 	| newSelector |
 	"This will dispatch the message depending if we won't to replace it's selector by one or several messages"
-	super visitMessageNode:aMessageNode.
-	
-	newSelector:=self getMessageSelector:aMessageNode selector.
+	super visitMessageNode: aMessageNode.
+	newSelector := self getMessageSelector: aMessageNode selector.
 	newSelector = aMessageNode selector
-	ifTrue:[^self]. "Nothing to change here !"
-	
+		ifTrue: [ ^ self ].	"Nothing to change here !"
 	newSelector isArray
-	ifFalse:[ self message: aMessageNode withNewSelector: newSelector.] 
-	ifTrue:[ self message: aMessageNode expandInMultipleSelectors: newSelector].
+		ifFalse: [ self message: aMessageNode withNewSelector: newSelector ]
+		ifTrue: [ newSelector
+				ifNotEmpty: [ self message: aMessageNode expandInMultipleSelectors: newSelector ] ]
 ]
 
 { #category : #visiting }
@@ -220,8 +219,11 @@ PlainCodeVisitor >> visitVariableNode: aVariableNode [
 	resolvedVariable isNil
 		ifTrue: [ ^ self ].
 	resolvedVariable isArray
-		ifTrue: [ resolvedVariable size ~= 1
+		ifTrue: [ resolvedVariable size = 0
+			ifTrue:[^self]
+			ifFalse:[
+				resolvedVariable size < 1
 				ifTrue: [ ^ self variableExpandsInMultipleVariables: aVariableNode ]
-				ifFalse: [ resolvedVariable := resolvedVariable anyOne ] ].
+				ifFalse: [ resolvedVariable := resolvedVariable anyOne ] ]].
 	aVariableNode name: resolvedVariable
 ]
