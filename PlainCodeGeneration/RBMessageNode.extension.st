@@ -18,10 +18,10 @@ RBMessageNode >> isInnerMessage [
 ]
 
 { #category : #'*PlainCodeGeneration' }
-RBMessageNode >> outerMostMessageNode [
+RBMessageNode >> outerMostMessage [
 	^self isInnerMessage
 		ifTrue:[
-			^parent outerMostMessageNode.
+			^parent outerMostMessage.
 			]
 		ifFalse:[
 			^self

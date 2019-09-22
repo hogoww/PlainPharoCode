@@ -35,7 +35,7 @@ PlainCodeVisitor >> aCodeGeneratorFromBlock:aBlock andArguments: aDictionary [
 		context:aBlock outerContext;
 		argumentDictionary: aDictionary;
 		yourself.
-	ast:=aBlock sourceNode copy. "Working on a copy, to not modify the defined ast"
+	ast:=aBlock asPlainCodeBC copy. "Working on a copy, to not modify the defined ast"
 		
 	ast acceptVisitor: visitor.
 	^ast
@@ -78,7 +78,7 @@ PlainCodeVisitor >> generateCode: aSelector withBody: aBlock andArguments: aDict
 	^RBMethodNode
 		selector: aSelector
 		arguments: updatedBlock arguments
-		body: updatedBlock body.
+		body: updatedBlock body
 ]
 
 { #category : #visiting }
@@ -103,7 +103,7 @@ PlainCodeVisitor >> getReplacementName: aString [
 { #category : #expand }
 PlainCodeVisitor >> message: aMessageNode expandInMultipleSelectors: aCollectionOfSelector [ 
 	| newArguments replacementNodes oom |
-	oom := aMessageNode outerMostMessageNode.
+	oom := aMessageNode outerMostMessage.
 	
 	oom parent isReturn ifTrue:[ ExpandReturnError signal ].
 	
@@ -144,7 +144,7 @@ PlainCodeVisitor >> variableExpandsInMultipleVariables: aNode [
 	(aNode parent isMessage and:[ aNode parent receiver = aNode ])
 	ifFalse:[^self].
 
-	omm:=aNode parent outerMostMessageNode.
+	omm:=aNode parent outerMostMessage.
 	omm parent isReturn ifTrue:[^ExpandReturnError new signal].
 	
 	res:=(context lookupSymbol: aNode name) collect:[:aStatement| 
@@ -156,7 +156,7 @@ PlainCodeVisitor >> variableExpandsInMultipleVariables: aNode [
 { #category : #expand }
 PlainCodeVisitor >> variableExpandsInMultipleVariablesInMessage: aNode [
 	| omm res |
-	omm:=aNode parent outerMostMessageNode.
+	omm:=aNode parent outerMostMessage.
 	omm parent isReturn ifTrue:[^ExpandReturnError new signal].
 	
 	res:=(context lookupSymbol: aNode name) collect:[:aStatement| 
@@ -219,11 +219,10 @@ PlainCodeVisitor >> visitVariableNode: aVariableNode [
 	resolvedVariable isNil
 		ifTrue: [ ^ self ].
 	resolvedVariable isArray
-		ifTrue: [ resolvedVariable 
-			ifEmpty:[^self]
-			ifNotEmpty:[
-				resolvedVariable size < 1
-				ifTrue: [ ^ self variableExpandsInMultipleVariables: aVariableNode ]
-				ifFalse: [ resolvedVariable := resolvedVariable anyOne ] ]].
+		ifTrue: [ resolvedVariable
+				ifEmpty: [ ^ self ]
+				ifNotEmpty: [ resolvedVariable size < 1
+						ifTrue: [ ^ self variableExpandsInMultipleVariables: aVariableNode ]
+						ifFalse: [ resolvedVariable := resolvedVariable anyOne ] ] ].
 	aVariableNode name: resolvedVariable
 ]
