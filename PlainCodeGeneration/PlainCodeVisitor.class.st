@@ -136,14 +136,30 @@ PlainCodeVisitor >> message: aMessageNode withNewSelector: newSelector [
 ]
 
 { #category : #expand }
-PlainCodeVisitor >> variableExpandsInArrayNode: anArrayNode [
+PlainCodeVisitor >> variableExpandsInMultipleVariables: aNode [
 	| omm res |
-	(anArrayNode parent isMessage and:[ anArrayNode parent receiver = anArrayNode ])
+
+	aNode parent isReturn
+		ifTrue: [ ExpandReturnError signal ].
+	(aNode parent isMessage and:[ aNode parent receiver = aNode ])
 	ifFalse:[^self].
-	omm:=anArrayNode parent outerMostMessageNode.
+
+	omm:=aNode parent outerMostMessageNode.
 	omm parent isReturn ifTrue:[^ExpandReturnError new signal].
 	
-	res:=(context lookupSymbol: anArrayNode name) collect:[:aStatement| 
+	res:=(context lookupSymbol: aNode name) collect:[:aStatement| 
+		omm copy innerMostMessage receiver: (RBVariableNode named:aStatement)
+		].
+	omm parent replaceNode: omm withNodes: res.
+]
+
+{ #category : #expand }
+PlainCodeVisitor >> variableExpandsInMultipleVariablesInMessage: aNode [
+	| omm res |
+	omm:=aNode parent outerMostMessageNode.
+	omm parent isReturn ifTrue:[^ExpandReturnError new signal].
+	
+	res:=(context lookupSymbol: aNode name) collect:[:aStatement| 
 		omm copy innerMostMessage receiver: (RBVariableNode named:aStatement)
 		].
 	omm parent replaceNode: omm withNodes: res.
@@ -200,9 +216,12 @@ PlainCodeVisitor >> visitMessageNode: aMessageNode [
 PlainCodeVisitor >> visitVariableNode: aVariableNode [
 	| resolvedVariable |
 	super visitVariableNode: aVariableNode.
-	
 	resolvedVariable := context lookupSymbol: aVariableNode name.
+	resolvedVariable isNil
+		ifTrue: [ ^ self ].
 	resolvedVariable isArray
-		ifTrue: [ self variableExpandsInArrayNode: aVariableNode ]
-		ifFalse: [ aVariableNode name: (self getReplacementName: aVariableNode name) ]
+		ifTrue: [ resolvedVariable size ~= 1
+				ifTrue: [ ^ self variableExpandsInMultipleVariables: aVariableNode ]
+				ifFalse: [ resolvedVariable := resolvedVariable anyOne ] ].
+	aVariableNode name: resolvedVariable
 ]

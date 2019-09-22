@@ -16,7 +16,7 @@ Class {
 		'parser',
 		'plainCode'
 	],
-	#category : #'PlainCodeGeneration-tests'
+	#category : #'PlainCodeGeneration-Tests-tests'
 }
 
 { #category : #'tests-variables' }
@@ -83,7 +83,7 @@ PlainCodeVisitorTest >> testExpandInReturnTwoUnary [
 	"The variable is instanciated with an array, it should therefore be expanded as two messages. But given that you can't have two return statement in a row, hence, it'll throw an error"
 	u := { #truc . #truc2 }.
 	initialBlock:=[ ^ 1 u ].
-	"Expected: [ 1 truc1. 1 truc2.] (if it didn't fail)"
+	"Expected: [ 1 truc1. 1 truc2.]"
 	self should:[ plainCode generateCode: #aMethod withBody: initialBlock ] raise:ExpandReturnError.
 ]
 
@@ -397,6 +397,25 @@ PlainCodeVisitorTest >> testLeftSideAssignementVariableNodeExpand [
 ]
 
 { #category : #'tests-messages' }
+PlainCodeVisitorTest >> testMiddleUnarySelectorChangeWithUnaryOuterNode [
+	| k initialBlock modifiedBlockAST|
+	"The variable is instanciated with a value, it should therefore be replaced"
+	k := #aSelector.
+	initialBlock:=[ ^ 1 b k a ].
+	modifiedBlockAST := plainCode generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: k isNotNil.
+	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'b' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'k' in: modifiedBlockAST) equals: 0.	
+	self assert: (self countID: #aSelector in: modifiedBlockAST) equals: 1.
+	self assert: (self countID:'a' in: modifiedBlockAST) equals: 1.
+	self assert: (self countID:'b' in: modifiedBlockAST) equals: 1.
+	self shouldnt: [parser parseMethod: modifiedBlockAST asString] raise:Error.
+]
+
+{ #category : #'tests-messages' }
 PlainCodeVisitorTest >> testOuterUnarySelectorChange [
 	| k initialBlock modifiedBlock|
 	"The variable is instanciated with a value, it should therefore be replaced"
@@ -570,6 +589,8 @@ PlainCodeVisitorTest >> testReplaceOneUnarySelectorByTwoUnarySelectors [
 PlainCodeVisitorTest >> testRighSideAssignementVariableNodeExpand [
 	| initialBlock modifiedBlock a b |
 	"Both value should be assigned to the left hand side. I doubt it makes sense, but it should be possible"
+	<expectedFailure>
+	
 	
 	a:={ 'druss' . 'waylander' }.
 	
@@ -623,8 +644,27 @@ PlainCodeVisitorTest >> testTryExpandOnAReturn [
 	
 	a:={ 'druss' . 'waylander' }.
 	
-	initialBlock := [	^ a aMessage ].
-	self should: [plainCode generateCode: #aMethod withBody: initialBlock ] raise:ExpandReturnError.	
+	initialBlock := [	^ a ].
+	self should: [ plainCode generateCode: #aMethod withBody: initialBlock ] raise:ExpandReturnError.	
+]
+
+{ #category : #'test-variable-expand' }
+PlainCodeVisitorTest >> testTryExpandOneVariableOnAReturn [
+	| initialBlock a modifiedBlock |
+	"Cannot expand an array on a return, it would give the following code:
+	^druss
+	^ŵaylander
+	which is obviously not valid"
+	a := {'waylander'}.
+	initialBlock := [ ^ a ].
+	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: a size equals: 1.
+	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'a' in: modifiedBlock) equals: 0. 
+	self assert: (self countID:'waylander' in: modifiedBlock) equals: 1.
+	
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
 { #category : #'tests-messages' }
