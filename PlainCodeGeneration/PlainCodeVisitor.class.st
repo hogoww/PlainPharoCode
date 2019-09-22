@@ -219,9 +219,9 @@ PlainCodeVisitor >> visitVariableNode: aVariableNode [
 	resolvedVariable isNil
 		ifTrue: [ ^ self ].
 	resolvedVariable isArray
-		ifTrue: [ resolvedVariable size = 0
-			ifTrue:[^self]
-			ifFalse:[
+		ifTrue: [ resolvedVariable 
+			ifEmpty:[^self]
+			ifNotEmpty:[
 				resolvedVariable size < 1
 				ifTrue: [ ^ self variableExpandsInMultipleVariables: aVariableNode ]
 				ifFalse: [ resolvedVariable := resolvedVariable anyOne ] ]].
