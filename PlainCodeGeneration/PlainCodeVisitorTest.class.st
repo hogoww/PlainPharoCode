@@ -578,10 +578,9 @@ PlainCodeVisitorTest >> testRighSideAssignementVariableNodeExpand [
 	
 	self assert: a isArray.
 	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 0.
+	self assert: (self countID:'a' in: modifiedBlock) equals: 0.
 	self assert: (self countID:'druss' in: modifiedBlock) equals: 1.
 	self assert: (self countID:'waylander' in: modifiedBlock) equals: 1.
-	self assert: (self countID: #aMessage in: modifiedBlock) equals: 2.
 	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
