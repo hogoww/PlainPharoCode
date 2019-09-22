@@ -307,6 +307,50 @@ PlainCodeVisitorTest >> testInstanceVariableSet [
 ]
 
 { #category : #'tests-variables' }
+PlainCodeVisitorTest >> testInstanceVariableSetWithEmptyArrayForMessage [
+	| initialBlock modifiedBlock |
+	"The instance variable is set, therefore should be replaced in the block"
+	
+	anInstanceVariable := {} .
+	
+	initialBlock := [	^ 1 anInstanceVariable ].
+	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	
+	[
+		self assert: anInstanceVariable isNotNil.
+		self assert: (self countID:'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
+		self assert: (self countID:'anInstanceVariable' in: modifiedBlock) equals: 1.
+		self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	] ensure: [
+		anInstanceVariable := nil.
+	]
+	
+	
+]
+
+{ #category : #'tests-variables' }
+PlainCodeVisitorTest >> testInstanceVariableSetWithEmptyArrayForVariable [
+	| initialBlock modifiedBlock |
+	"The instance variable is set, therefore should be replaced in the block"
+	
+	anInstanceVariable := {} .
+	
+	initialBlock := [	^ anInstanceVariable ].
+	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	
+	[
+		self assert: anInstanceVariable isNotNil.
+		self assert: (self countID:'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
+		self assert: (self countID:'anInstanceVariable' in: modifiedBlock) equals: 1.
+		self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	] ensure: [
+		anInstanceVariable := nil.
+	]
+	
+	
+]
+
+{ #category : #'tests-variables' }
 PlainCodeVisitorTest >> testInstanceVariableUnset [
 	| initialBlock modifiedBlock |
 	"The instanceVariable is set to nil, so it shouldn't replace anything"
