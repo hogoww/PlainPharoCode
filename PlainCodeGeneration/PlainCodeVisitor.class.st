@@ -198,6 +198,11 @@ PlainCodeVisitor >> visitAssignmentNode: anAssignmentNode [
 ]
 
 { #category : #visiting }
+PlainCodeVisitor >> visitGlobalNode: aGlobalNode [
+	"The other kind of variable nodes have to be treated. This one doesn't"
+]
+
+{ #category : #visiting }
 PlainCodeVisitor >> visitMessageNode: aMessageNode [
 	| newSelector |
 	"This will dispatch the message depending if we won't to replace it's selector by one or several messages"
