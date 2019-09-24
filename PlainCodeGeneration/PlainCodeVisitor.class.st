@@ -30,15 +30,15 @@ Class {
 
 { #category : #formatting }
 PlainCodeVisitor >> aCodeGeneratorFromBlock:aBlock andArguments: aDictionary [
-	| visitor ast |
+	| visitor pcbc |
 	visitor:=PlainCodeVisitor new
 		context:aBlock outerContext;
 		argumentDictionary: aDictionary;
 		yourself.
-	ast:=aBlock asPlainCodeBC copy. "Working on a copy, to not modify the defined ast"
+	pcbc:=aBlock asPlainCodeBC copy. "Working on a copy, to not modify the defined ast"
 		
-	ast acceptVisitor: visitor.
-	^ast
+	pcbc blockNode acceptVisitor: visitor.
+	^pcbc blockNode
 ]
 
 { #category : #accessing }
