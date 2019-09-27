@@ -37,21 +37,25 @@ PlainCodeVisitor >> aCodeGeneratorFromBlock: aPlainCodeBlock andArguments: aDict
 
 { #category : #accessing }
 PlainCodeVisitor >> argumentDictionary [
+	<ignoreForCoverage>
 	^ argumentDictionary
 ]
 
 { #category : #accessing }
 PlainCodeVisitor >> argumentDictionary: aDictionary [
+	<ignoreForCoverage>
 	^ argumentDictionary := aDictionary
 ]
 
 { #category : #accessing }
 PlainCodeVisitor >> context [
+	<ignoreForCoverage>
 	^ context
 ]
 
 { #category : #accessing }
 PlainCodeVisitor >> context: aContext [
+	<ignoreForCoverage>
 	^ context := aContext
 ]
 
