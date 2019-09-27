@@ -153,18 +153,6 @@ PlainCodeVisitor >> variableExpandsInMultipleVariables: aNode [
 	omm parent replaceNode: omm withNodes: res.
 ]
 
-{ #category : #expand }
-PlainCodeVisitor >> variableExpandsInMultipleVariablesInMessage: aNode [
-	| omm res |
-	omm:=aNode parent outerMostMessage.
-	omm parent isReturn ifTrue:[^ExpandReturnError new signal].
-	
-	res:=(context lookupSymbol: aNode name) collect:[:aStatement| 
-		omm copy innerMostMessage receiver: (RBVariableNode named:aStatement)
-		].
-	omm parent replaceNode: omm withNodes: res.
-]
-
 { #category : #visiting }
 PlainCodeVisitor >> visitArgumentNode: anArgumentNode [
 	| replacementName |
