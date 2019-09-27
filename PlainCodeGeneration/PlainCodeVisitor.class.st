@@ -226,7 +226,7 @@ PlainCodeVisitor >> visitVariableNode: aVariableNode [
 	resolvedVariable isArray
 		ifTrue: [ resolvedVariable
 				ifEmpty: [ ^ self ]
-				ifNotEmpty: [ resolvedVariable size < 1
+				ifNotEmpty: [ resolvedVariable size > 1
 						ifTrue: [ ^ self variableExpandsInMultipleVariables: aVariableNode ]
 						ifFalse: [ resolvedVariable := resolvedVariable anyOne ] ] ].
 	aVariableNode name: resolvedVariable
