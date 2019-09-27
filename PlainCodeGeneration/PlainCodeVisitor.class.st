@@ -176,7 +176,10 @@ PlainCodeVisitor >> visitAssignmentNode: anAssignmentNode [
 		node variable name: aName.
 		node.
 		].
-	anAssignmentNode parent replaceNode: anAssignmentNode withNodes: expandedNodes.
+	
+	expandedNodes size = 1
+	ifTrue:[anAssignmentNode parent replaceNode: anAssignmentNode withNode: expandedNodes anyOne]
+	ifFalse:[anAssignmentNode parent replaceNode: anAssignmentNode withNodes: expandedNodes ]
 ]
 
 { #category : #visiting }

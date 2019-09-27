@@ -495,6 +495,31 @@ PlainCodeVisitorTest >> testReceiverVariableNodeExpand [
 	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
+{ #category : #'test-variable-expand' }
+PlainCodeVisitorTest >> testReplaceBothAssignementSidesInReturn [
+	| initialBlock a modifiedBlock b |
+	"Cannot expand an array on a return, it would give the following code:
+	^druss
+	^ŵaylander
+	which is obviously not valid"
+	a := {'waylander'}.
+	b := { 'druss' }.
+	initialBlock := [ ^ a := b ].
+	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	
+	self assert: a size equals: 1.
+	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'b' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'a' in: modifiedBlock) equals: 0. 
+	self assert: (self countID:'b' in: modifiedBlock) equals: 0. 
+	self assert: (self countID:'waylander' in: modifiedBlock) equals: 1.
+	self assert: (self countID:'druss' in: modifiedBlock) equals: 1. 
+	self halt.
+
+	
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+]
+
 { #category : #'tests-variables' }
 PlainCodeVisitorTest >> testReplaceInnerArgumentWithSetValue [
 	| initialBlock modifiedBlock anotherArg argReplacement |
