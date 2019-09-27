@@ -9,29 +9,30 @@ Class {
 
 { #category : #tests }
 PCBlockClosureASTTest >> testBlockClosureConversion [
-	|aPCBlock|
-	aPCBlock := [ 3 ] asPlainCodeBC.
-	self assert: aPCBlock class equals: PCBlockClosureAST.
-	self assert: aPCBlock blockNode class equals: RBBlockNode.
+	|aPCBlocks|
+	aPCBlocks := [ 3 ] asPlainCodeBC.
+	self assert: aPCBlocks class equals: PCBlocks.
+	self assert: (aPCBlocks blocks at: 1) class equals: BlockClosure.
 	
 	
 ]
 
 { #category : #tests }
 PCBlockClosureASTTest >> testPCBlockClosureAdditionWithArgumentsInBothBlock [
-	| aPCBlock anotherPCBlock res |
+	| aPCBlock anotherPCBlock res resAst |
 	"test concanating two simple blocks, without arguments."
 	aPCBlock := [:a| a ] asPlainCodeBC.
 	anotherPCBlock := [:b| b ] asPlainCodeBC.
 	res := aPCBlock + anotherPCBlock.
-	self assert: res class equals: PCBlockClosureAST.
-	self assert: res blockNode class equals: RBBlockNode.
-	self assert: res blockNode statements size equals: 2.
-	self assert: (res blockNode statements at: 1) name equals: 'a'.
-	self assert: (res blockNode statements at: 2) name equals: 'b'.
-	self assert: res blockNode arguments size equals: 2.
-	self assert: (res blockNode arguments at: 1) name equals: 'a'.
-	self assert: (res blockNode arguments at: 2) name equals: 'b'.
+	resAst := (res blocks at:1) sourceNode.
+	self assert: res class equals: PCBlocks.
+	self assert: resAst class equals: RBBlockNode.
+	self assert: resAst statements size equals: 2.
+	self assert: (resAst statements at: 1) name equals: 'a'.
+	self assert: (resAst statements at: 2) name equals: 'b'.
+	self assert: resAst arguments size equals: 2.
+	self assert: (resAst arguments at: 1) name equals: 'a'.
+	self assert: (resAst arguments at: 2) name equals: 'b'.
 ]
 
 { #category : #tests }
@@ -41,13 +42,13 @@ PCBlockClosureASTTest >> testPCBlockClosureAdditionWithArgumentsInBothBlockWithS
 	aPCBlock := [:a| a ] asPlainCodeBC.
 	anotherPCBlock := [:a| a ] asPlainCodeBC.
 	res := aPCBlock + anotherPCBlock.
-	self assert: res class equals: PCBlockClosureAST.
-	self assert: res blockNode class equals: RBBlockNode.
-	self assert: res blockNode statements size equals: 2.
-	self assert: (res blockNode statements at: 1) name equals: 'a'.
-	self assert: (res blockNode statements at: 2) name equals: 'a'.
-	self assert: res blockNode arguments size equals: 1.
-	self assert: (res blockNode arguments at: 1) name equals: 'a'.
+	self assert: res class equals: PCBlocks.
+	self assert: res blocks class equals: RBBlockNode.
+	self assert: res blocks statements size equals: 2.
+	self assert: (res blocks statements at: 1) name equals: 'a'.
+	self assert: (res blocks statements at: 2) name equals: 'a'.
+	self assert: res blocks arguments size equals: 1.
+	self assert: (res blocks arguments at: 1) name equals: 'a'.
 ]
 
 { #category : #tests }
@@ -57,13 +58,13 @@ PCBlockClosureASTTest >> testPCBlockClosureAdditionWithArgumentsInOneBlock [
 	aPCBlock := [:a| a ] asPlainCodeBC.
 	anotherPCBlock := [ 4 ] asPlainCodeBC.
 	res := aPCBlock + anotherPCBlock.
-	self assert: res class equals: PCBlockClosureAST.
-	self assert: res blockNode class equals: RBBlockNode.
-	self assert: res blockNode statements size equals: 2.
-	self assert: (res blockNode statements at: 1) name equals: 'a'.
-	self assert: (res blockNode statements at: 2) value equals: 4.
-	self assert: res blockNode arguments size equals: 1.
-	self assert: (res blockNode arguments at: 1) name equals: 'a'.
+	self assert: res class equals: PCBlocks.
+	self assert: res blocks class equals: RBBlockNode.
+	self assert: res blocks statements size equals: 2.
+	self assert: (res blocks statements at: 1) name equals: 'a'.
+	self assert: (res blocks statements at: 2) value equals: 4.
+	self assert: res blocks arguments size equals: 1.
+	self assert: (res blocks arguments at: 1) name equals: 'a'.
 ]
 
 { #category : #tests }
@@ -73,10 +74,10 @@ PCBlockClosureASTTest >> testPCBlockClosureAdditionWithoutArguments [
 	aPCBlock := [ 3 ] asPlainCodeBC.
 	anotherPCBlock := [ 4 ] asPlainCodeBC.
 	res := aPCBlock + anotherPCBlock.
-	self assert: res class equals: PCBlockClosureAST.
-	self assert: res blockNode class equals: RBBlockNode.
-	self assert: res blockNode statements size equals: 2.
-	self assert: (res blockNode statements at: 1) value equals: 3.
-	self assert: (res blockNode statements at: 2) value equals: 4.
-	self assert: res blockNode arguments size equals: 0
+	self assert: res class equals: PCBlocks.
+	self assert: res blocks class equals: RBBlockNode.
+	self assert: res blocks statements size equals: 2.
+	self assert: (res blocks statements at: 1) value equals: 3.
+	self assert: (res blocks statements at: 2) value equals: 4.
+	self assert: res blocks arguments size equals: 0
 ]

@@ -29,16 +29,10 @@ Class {
 }
 
 { #category : #formatting }
-PlainCodeVisitor >> aCodeGeneratorFromBlock:aBlock andArguments: aDictionary [
-	| visitor pcbc |
-	visitor:=PlainCodeVisitor new
-		context:aBlock outerContext;
-		argumentDictionary: aDictionary;
-		yourself.
-	pcbc:=aBlock asPlainCodeBC copy. "Working on a copy, to not modify the defined ast"
-		
-	pcbc blockNode acceptVisitor: visitor.
-	^pcbc blockNode
+PlainCodeVisitor >> aCodeGeneratorFromBlock: aPlainCodeBlock andArguments: aDictionary [
+	| res |
+	res:=aPlainCodeBlock replaceWithContextAndArguments: aDictionary .
+	^ res concatenationResult
 ]
 
 { #category : #accessing }

@@ -1,6 +1,11 @@
 Extension { #name : #BlockClosure }
 
 { #category : #'*PlainCodeGeneration' }
+BlockClosure >> + aBlock [
+	^ self asPlainCodeBC + aBlock
+]
+
+{ #category : #'*PlainCodeGeneration' }
 BlockClosure >> asMethod: aSelector [
 	^ self asMethod: aSelector withArgs: Dictionary new
 
@@ -13,7 +18,13 @@ BlockClosure >> asMethod: aSelector withArgs: aDictionary [
 
 { #category : #'*PlainCodeGeneration' }
 BlockClosure >> asPlainCodeBC [
-	^PCBlockClosureAST new
-		blockNode: self sourceNode copy;
+	^PCBlocks new
+		+ self copy;
 		yourself
+]
+
+{ #category : #'*PlainCodeGeneration' }
+BlockClosure >> replaceWithContextAndArguments: aDictionaryForArguments [
+	^ self asPlainCodeBC
+		replaceWithContextAndArguments: aDictionaryForArguments
 ]

@@ -67,7 +67,7 @@ PlainCodeVisitorTest >> testBinarySelectors [
 	"The variable is instanciated with a value, it should therefore be replaced"
 	b := #- .
 	initialBlock:=[ ^ 1 b:{ 1 } ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock. 
 	"Expected: [^1-1 ]".
 	
 	self assert: b isNotNil.
