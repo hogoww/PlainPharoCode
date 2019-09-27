@@ -514,7 +514,6 @@ PlainCodeVisitorTest >> testReplaceBothAssignementSidesInReturn [
 	self assert: (self countID:'b' in: modifiedBlock) equals: 0. 
 	self assert: (self countID:'waylander' in: modifiedBlock) equals: 1.
 	self assert: (self countID:'druss' in: modifiedBlock) equals: 1. 
-	self halt.
 
 	
 	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.

@@ -148,13 +148,29 @@ PlainCodeVisitor >> variableExpandsInMultipleVariables: aNode [
 ]
 
 { #category : #visiting }
+PlainCodeVisitor >> variablesNodesVisit: aNode [
+	"visits for IV/argument/temporary nodes"
+	| resolvedVariable |
+	resolvedVariable := context lookupSymbol: aNode name.
+	resolvedVariable isNil
+		ifTrue: [ ^ self ].
+	resolvedVariable isArray
+		ifTrue: [ resolvedVariable
+				ifEmpty: [ ^ self ]
+				ifNotEmpty: [ resolvedVariable size > 1
+						ifTrue: [ ^ self variableExpandsInMultipleVariables: aNode ]
+						ifFalse: [ resolvedVariable := resolvedVariable anyOne ] ] ].
+	aNode name: resolvedVariable.
+]
+
+{ #category : #visiting }
 PlainCodeVisitor >> visitArgumentNode: anArgumentNode [
 	| replacementName |
 	"This will take care of the replacing the inner block's arguments
 	[:b| b ] with the dictionary containing 'b'->a and a:=c will output the method with the body [:c| c ]"
 
 	replacementName:=argumentDictionary at:anArgumentNode name ifAbsent:[
-		^self visitVariableNode: anArgumentNode.
+		^self variablesNodesVisit: anArgumentNode.
 		].
 	replacementName ifNotNil:[
 		anArgumentNode name: replacementName.
@@ -166,7 +182,7 @@ PlainCodeVisitor >> visitArgumentNode: anArgumentNode [
 PlainCodeVisitor >> visitAssignmentNode: anAssignmentNode [
 	| resolvedName expandedNodes |
 	anAssignmentNode value acceptVisitor:self.
-	
+
 	resolvedName:=context lookupSymbol: anAssignmentNode variable name.
 	resolvedName isArray 
 	ifFalse:[^self].
@@ -178,13 +194,13 @@ PlainCodeVisitor >> visitAssignmentNode: anAssignmentNode [
 		].
 	
 	expandedNodes size = 1
-	ifTrue:[anAssignmentNode parent replaceNode: anAssignmentNode withNode: expandedNodes anyOne]
+	ifTrue:[anAssignmentNode parent replaceNode: anAssignmentNode withNode: expandedNodes anyOne]"needed for nodes who don't know #replaceNode:withNodes (ReturnNode)"
 	ifFalse:[anAssignmentNode parent replaceNode: anAssignmentNode withNodes: expandedNodes ]
 ]
 
 { #category : #visiting }
-PlainCodeVisitor >> visitGlobalNode: aGlobalNode [
-	"The other kind of variable nodes have to be treated. This one doesn't"
+PlainCodeVisitor >> visitInstanceVariableNode: anInstanceVariable [
+	self variablesNodesVisit: anInstanceVariable
 ]
 
 { #category : #visiting }
@@ -202,17 +218,6 @@ PlainCodeVisitor >> visitMessageNode: aMessageNode [
 ]
 
 { #category : #visiting }
-PlainCodeVisitor >> visitVariableNode: aVariableNode [
-	| resolvedVariable |
-	super visitVariableNode: aVariableNode.
-	resolvedVariable := context lookupSymbol: aVariableNode name.
-	resolvedVariable isNil
-		ifTrue: [ ^ self ].
-	resolvedVariable isArray
-		ifTrue: [ resolvedVariable
-				ifEmpty: [ ^ self ]
-				ifNotEmpty: [ resolvedVariable size > 1
-						ifTrue: [ ^ self variableExpandsInMultipleVariables: aVariableNode ]
-						ifFalse: [ resolvedVariable := resolvedVariable anyOne ] ] ].
-	aVariableNode name: resolvedVariable
+PlainCodeVisitor >> visitTemporaryNode: aTemporaryNode [
+	self variablesNodesVisit: aTemporaryNode
 ]
