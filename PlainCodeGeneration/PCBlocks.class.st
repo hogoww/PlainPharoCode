@@ -14,6 +14,12 @@ PCBlocks >> + aBlock [
 ]
 
 { #category : #ast }
+PCBlocks >> asBlock [
+	self replaceWithContextAndArguments: Dictionary new.
+	^ self concatenationResult 
+]
+
+{ #category : #ast }
 PCBlocks >> asMethod: aSelector [
 	^ self asMethod: aSelector withArgs: Dictionary new
 ]
@@ -51,7 +57,7 @@ PCBlocks >> concatenationResult [
 			temporaries addAll: anAst body temporaries ].
 	^ RBBlockNode
 		arguments: arguments asOrderedCollection
-		body: (RBSequenceNode temporaries: temporaries  statements: statements asOrderedCollection )
+		body: (RBSequenceNode temporaries: temporaries  statements: statements )
 ]
 
 { #category : #concatenation }
@@ -71,5 +77,5 @@ PCBlocks >> replaceWithContextAndArguments: aDictionaryForArguments [
 				yourself.
 			resAst := aBlock sourceNode copy.
 			resAst acceptVisitor: visitor.
-			asts := resAst ]
+			asts add: resAst ]
 ]

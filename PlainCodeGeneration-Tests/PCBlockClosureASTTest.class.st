@@ -21,10 +21,10 @@ PCBlockClosureASTTest >> testBlockClosureConversion [
 PCBlockClosureASTTest >> testPCBlockClosureAdditionWithArgumentsInBothBlock [
 	| aPCBlock anotherPCBlock res resAst |
 	"test concanating two simple blocks, without arguments."
-	aPCBlock := [:a| a ] asPlainCodeBC.
-	anotherPCBlock := [:b| b ] asPlainCodeBC.
+	aPCBlock := [:a| a ].
+	anotherPCBlock := [:b| b ].
 	res := aPCBlock + anotherPCBlock.
-	resAst := (res blocks at:1) sourceNode.
+	resAst := res asBlock.
 	self assert: res class equals: PCBlocks.
 	self assert: resAst class equals: RBBlockNode.
 	self assert: resAst statements size equals: 2.
@@ -37,47 +37,50 @@ PCBlockClosureASTTest >> testPCBlockClosureAdditionWithArgumentsInBothBlock [
 
 { #category : #tests }
 PCBlockClosureASTTest >> testPCBlockClosureAdditionWithArgumentsInBothBlockWithSameName [
-	| aPCBlock anotherPCBlock res |
+	| aPCBlock anotherPCBlock res resAst |
 	"test concanating two simple blocks, without arguments."
-	aPCBlock := [:a| a ] asPlainCodeBC.
-	anotherPCBlock := [:a| a ] asPlainCodeBC.
+	aPCBlock := [:a| a ].
+	anotherPCBlock := [:a| a ].
 	res := aPCBlock + anotherPCBlock.
+	resAst := res asBlock.
 	self assert: res class equals: PCBlocks.
-	self assert: res blocks class equals: RBBlockNode.
-	self assert: res blocks statements size equals: 2.
-	self assert: (res blocks statements at: 1) name equals: 'a'.
-	self assert: (res blocks statements at: 2) name equals: 'a'.
-	self assert: res blocks arguments size equals: 1.
-	self assert: (res blocks arguments at: 1) name equals: 'a'.
+	self assert: resAst class equals: RBBlockNode.
+	self assert: resAst statements size equals: 2.
+	self assert: (resAst statements at: 1) name equals: 'a'.
+	self assert: (resAst statements at: 2) name equals: 'a'.
+	self assert: resAst arguments size equals: 1.
+	self assert: (resAst arguments at: 1) name equals: 'a'.
 ]
 
 { #category : #tests }
 PCBlockClosureASTTest >> testPCBlockClosureAdditionWithArgumentsInOneBlock [
-	| aPCBlock anotherPCBlock res |
+	| aPCBlock anotherPCBlock res resAst |
 	"test concanating two simple blocks, without arguments."
-	aPCBlock := [:a| a ] asPlainCodeBC.
-	anotherPCBlock := [ 4 ] asPlainCodeBC.
+	aPCBlock := [:a| a ].
+	anotherPCBlock := [ 4 ].
 	res := aPCBlock + anotherPCBlock.
+	resAst:= res asBlock.
 	self assert: res class equals: PCBlocks.
-	self assert: res blocks class equals: RBBlockNode.
-	self assert: res blocks statements size equals: 2.
-	self assert: (res blocks statements at: 1) name equals: 'a'.
-	self assert: (res blocks statements at: 2) value equals: 4.
-	self assert: res blocks arguments size equals: 1.
-	self assert: (res blocks arguments at: 1) name equals: 'a'.
+	self assert: resAst class equals: RBBlockNode.
+	self assert: resAst statements size equals: 2.
+	self assert: (resAst statements at: 1) name equals: 'a'.
+	self assert: (resAst statements at: 2) value equals: 4.
+	self assert: resAst arguments size equals: 1.
+	self assert: (resAst arguments at: 1) name equals: 'a'.
 ]
 
 { #category : #tests }
 PCBlockClosureASTTest >> testPCBlockClosureAdditionWithoutArguments [
-	| aPCBlock anotherPCBlock res |
+	| aPCBlock anotherPCBlock res resAst |
 	"test concanating two simple blocks, without arguments."
-	aPCBlock := [ 3 ] asPlainCodeBC.
-	anotherPCBlock := [ 4 ] asPlainCodeBC.
+	aPCBlock := [ 3 ].
+	anotherPCBlock := [ 4 ].
 	res := aPCBlock + anotherPCBlock.
+	resAst := res asBlock.
 	self assert: res class equals: PCBlocks.
-	self assert: res blocks class equals: RBBlockNode.
-	self assert: res blocks statements size equals: 2.
-	self assert: (res blocks statements at: 1) value equals: 3.
-	self assert: (res blocks statements at: 2) value equals: 4.
-	self assert: res blocks arguments size equals: 0
+	self assert: resAst class equals: RBBlockNode.
+	self assert: resAst statements size equals: 2.
+	self assert: (resAst statements at: 1) value equals: 3.
+	self assert: (resAst statements at: 2) value equals: 4.
+	self assert: resAst arguments size equals: 0
 ]
