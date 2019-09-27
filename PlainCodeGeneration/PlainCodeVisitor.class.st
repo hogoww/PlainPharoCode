@@ -37,22 +37,22 @@ PlainCodeVisitor >> aCodeGeneratorFromBlock: aPlainCodeBlock andArguments: aDict
 
 { #category : #accessing }
 PlainCodeVisitor >> argumentDictionary [
-	^argumentDictionary
+	^ argumentDictionary
 ]
 
 { #category : #accessing }
 PlainCodeVisitor >> argumentDictionary: aDictionary [
-	^argumentDictionary:= aDictionary
+	^ argumentDictionary := aDictionary
 ]
 
 { #category : #accessing }
-PlainCodeVisitor >> context [ 
-	^context
+PlainCodeVisitor >> context [
+	^ context
 ]
 
 { #category : #accessing }
 PlainCodeVisitor >> context: aContext [
-	^context:=aContext
+	^ context := aContext
 ]
 
 { #category : #formatting }

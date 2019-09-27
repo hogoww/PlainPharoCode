@@ -67,7 +67,7 @@ PlainCodeVisitorTest >> testBinarySelectors [
 	"The variable is instanciated with a value, it should therefore be replaced"
 	b := #- .
 	initialBlock:=[ ^ 1 b:{ 1 } ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock. 
+	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
 	"Expected: [^1-1 ]".
 	
 	self assert: b isNotNil.
@@ -83,7 +83,7 @@ PlainCodeVisitorTest >> testExpandInReturnTwoUnary [
 	"The variable is instanciated with an array, it should therefore be expanded as two messages. But given that you can't have two return statement in a row, hence, it'll throw an error"
 	u := { #truc . #truc2 }.
 	initialBlock:=[ ^ 1 u ].
-	"Expected: [ 1 truc1. 1 truc2.]"
+
 	self should:[ plainCode generateCode: #aMethod withBody: initialBlock ] raise:ExpandReturnError.
 ]
 

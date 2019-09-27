@@ -18,8 +18,8 @@ BlockClosure >> asMethod: aSelector withArgs: aDictionary [
 
 { #category : #'*PlainCodeGeneration' }
 BlockClosure >> asPlainCodeBC [
-	^PCBlocks new
-		+ self copy;
+	^ PCBlocks new
+		+ self;
 		yourself
 ]
 

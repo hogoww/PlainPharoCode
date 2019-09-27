@@ -2,7 +2,8 @@ Class {
 	#name : #PCBlocks,
 	#superclass : #Object,
 	#instVars : [
-		'blocks'
+		'blocks',
+		'asts'
 	],
 	#category : #'PlainCodeGeneration-format'
 }
@@ -43,30 +44,32 @@ PCBlocks >> concatenationResult [
 	arguments := Set new.
 	statements := OrderedCollection new.
 	temporaries := Set new.
-	blocks
-		do: [ :aBlock | |ast|
-			ast := aBlock sourceNode.
-			arguments addAll: ast arguments.
-			statements addAll: ast body statements.
-			temporaries addAll: ast body temporaries ].
+	asts
+		do: [ :anAst |
+			arguments addAll: anAst arguments.
+			statements addAll: anAst body statements.
+			temporaries addAll: anAst body temporaries ].
 	^ RBBlockNode
 		arguments: arguments asOrderedCollection
-		body: (RBSequenceNode temporaries: temporaries statements: statements)
+		body: (RBSequenceNode temporaries: temporaries  statements: statements asOrderedCollection )
 ]
 
 { #category : #concatenation }
 PCBlocks >> initialize [
-	blocks := OrderedCollection new
+	blocks := OrderedCollection new.
+	asts := OrderedCollection new.
 ]
 
 { #category : #ast }
 PCBlocks >> replaceWithContextAndArguments: aDictionaryForArguments [
-	|  visitor |
+	| visitor resAst |
 	blocks
 		do: [ :aBlock | 
 			visitor := PlainCodeVisitor new
 				context: aBlock outerContext;
 				argumentDictionary: aDictionaryForArguments;
 				yourself.
-			aBlock sourceNode acceptVisitor: visitor ].
+			resAst := aBlock sourceNode copy.
+			resAst acceptVisitor: visitor.
+			asts := resAst ]
 ]
