@@ -31,7 +31,7 @@ Class {
 { #category : #formatting }
 PlainCodeVisitor >> aCodeGeneratorFromBlock: aPlainCodeBlock andArguments: aDictionary [
 	| res |
-	res:=aPlainCodeBlock replaceWithContextAndArguments: aDictionary .
+	res := aPlainCodeBlock replaceWithContextAndArguments: aDictionary.
 	^ res concatenationResult
 ]
 
@@ -181,12 +181,12 @@ PlainCodeVisitor >> visitArgumentNode: anArgumentNode [
 { #category : #visiting }
 PlainCodeVisitor >> visitAssignmentNode: anAssignmentNode [
 	| resolvedName expandedNodes |
+
 	anAssignmentNode value acceptVisitor:self.
 
-	resolvedName:=context lookupSymbol: anAssignmentNode variable name.
-	resolvedName isArray 
-	ifFalse:[^self].
-	expandedNodes:=resolvedName collect:[:aName| 
+	resolvedName := context lookupSymbol: anAssignmentNode variable name.
+	resolvedName isArray ifFalse:[resolvedName := {resolvedName } ].
+	expandedNodes := resolvedName collect:[:aName| 
 		|node|
 		node:=anAssignmentNode copy.
 		node variable name: aName.
