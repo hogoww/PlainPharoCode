@@ -189,7 +189,9 @@ PlainCodeVisitor >> visitAssignmentNode: anAssignmentNode [
 	anAssignmentNode value acceptVisitor:self.
 
 	resolvedName := context lookupSymbol: anAssignmentNode variable name.
-	resolvedName isArray ifFalse:[resolvedName := {resolvedName } ].
+	resolvedName ifNil:[ ^self ].
+	
+	resolvedName isArray ifFalse:[resolvedName := { resolvedName } ].
 	expandedNodes := resolvedName collect:[:aName| 
 		|node|
 		node:=anAssignmentNode copy.
