@@ -122,7 +122,7 @@ PlainCodeVisitor >> message: aMessageNode expandInMultipleSelectors: aCollection
 PlainCodeVisitor >> message: aMessageNode withNewSelector: newSelector [
 	| newArguments replacementNodes |
 	newArguments:=aMessageNode arguments 
-		ifNotEmpty:[:args| args at:1 ] "we take the ArrayNode's collection directly"
+		ifNotEmpty:[:args| args at:1 ]	"we take the ArrayNode's collection directly"
 		ifEmpty:[ OrderedCollection new ]. 
 	newArguments size > 0 ifTrue:[ newArguments := newArguments statements].
 
