@@ -11,8 +11,8 @@ BaselineOfPlainPharoCode >> baseline: spec [
 		for: #common
 		do: [
 			spec
-				package: 'PlainPharoCode';
-				package: 'PlainPharoCode-Tests' with:[ spec requires:#('PlainPharoCode') ]
+				package: 'PlainCodeGeneration';
+				package: 'PlainCodeGeneration-Tests' with:[ spec requires:#('PlainCodeGeneration') ]
 		].
 ]
 
