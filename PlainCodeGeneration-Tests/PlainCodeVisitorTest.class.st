@@ -13,8 +13,7 @@ Class {
 	#superclass : #TestCase,
 	#instVars : [
 		'anInstanceVariable',
-		'parser',
-		'plainCode'
+		'parser'
 	],
 	#category : #'PlainCodeGeneration-Tests-tests'
 }
@@ -23,8 +22,8 @@ Class {
 PlainCodeVisitorTest >> aTestExternargumentSet:anArg [
 	| initialBlock modifiedBlock|
 	initialBlock:=[ ^ anArg ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
-	
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
+		
 	self assert: anArg isNotNil.
 	self assert: (self countID:'anArg' in: initialBlock sourceNode) equals: 1.
 	self assert: (self countID:'anArg' in: modifiedBlock) equals: 0. 
@@ -36,7 +35,7 @@ PlainCodeVisitorTest >> aTestExternargumentSet:anArg [
 PlainCodeVisitorTest >> aTestExternargumentUnSet:anArg [
 	| initialBlock modifiedBlock|
 	initialBlock:=[ ^ anArg ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: anArg isNil.
 	self assert: (self countID:'anArg' in: initialBlock sourceNode) equals: 1.
@@ -58,7 +57,6 @@ PlainCodeVisitorTest >> countID: anID in: aNode [
 PlainCodeVisitorTest >> setUp [
 	"Hooks that subclasses may override to define the fixture of test."
 	parser := RBParser.
-	plainCode := PlainCodeVisitor new.
 ]
 
 { #category : #'tests-messages' }
@@ -67,7 +65,7 @@ PlainCodeVisitorTest >> testBinarySelectors [
 	"The variable is instanciated with a value, it should therefore be replaced"
 	b := #- .
 	initialBlock:=[ ^ 1 b:{ 1 } ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := initialBlock asMethod: #aMethod
 	"Expected: [^1-1 ]".
 	
 	self assert: b isNotNil.
@@ -84,7 +82,7 @@ PlainCodeVisitorTest >> testExpandInReturnTwoUnary [
 	u := { #truc . #truc2 }.
 	initialBlock:=[ ^ 1 u ].
 
-	self should:[ plainCode generateCode: #aMethod withBody: initialBlock ] raise:ExpandReturnError.
+	self should:[ #aMethod asMethodWithBody: initialBlock ] raise:ExpandReturnError.
 ]
 
 { #category : #'tests-variables' }
@@ -103,7 +101,7 @@ PlainCodeVisitorTest >> testExternTemporarySet [
 	"The variable is instanciated with a value, it should therefore be replaced"
 	t := 'truc'.
 	initialBlock:=[ ^ t ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	"Expected: [ ^truc ]"
 	
 	self assert: t isNotNil.
@@ -120,7 +118,7 @@ PlainCodeVisitorTest >> testExternTemporaryUnset [
 	| t initialBlock modifiedBlock|
 	"There should be no replacement if the block's outer environment's variable equals nil"
 	initialBlock:=[ ^ t ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := initialBlock asMethod: #aMethod.
 	
 	self assert: t isNil.
 	self assert: (self countID:'t' in: initialBlock sourceNode) equals: 1.
@@ -134,7 +132,7 @@ PlainCodeVisitorTest >> testInnerArgument [
 	| initialBlock modifiedBlock |
 	"Nothing in the outer environnement, nothing changes"
 	initialBlock:=[:anArg | ^ anArg ].
-	modifiedBlock := plainCode generateCode: #aMethod: withBody: initialBlock.
+	modifiedBlock := #aMethod: asMethodWithBody: initialBlock.
 	
 	self assert: (self countID:'anArg' in: initialBlock sourceNode) equals: 2.
 	self assert: (self countID:'anArg' in: modifiedBlock) equals: 2. 
@@ -148,7 +146,7 @@ PlainCodeVisitorTest >> testInnerReplaceOneTernaryKeywordSelectorByTwoTernaryKey
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := { #truc: . #truc2: }.
 	initialBlock:=[ (1 k:{ 0 }) u ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
 	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
@@ -163,7 +161,7 @@ PlainCodeVisitorTest >> testInnerTemporary [
 	| initialBlock modifiedBlock|
 	"The outerContext doesn't affect the inner conntext, so nothing should move."
 	initialBlock:=[ |t| ^ t ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: (self countID:'t' in: initialBlock sourceNode) equals: 2.
 	self assert: (self countID:'t' in: modifiedBlock) equals: 2. 
@@ -177,7 +175,7 @@ PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithOuterKeywordMessage [
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector.
 	initialBlock:=[ ^ 1 k a: b ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
 	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
@@ -197,7 +195,7 @@ PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithA
 	k := #aSelector.
 	b := 'druss'.
 	initialBlock:=[ ^ 1 k a: {b} ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
 	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
@@ -217,7 +215,7 @@ PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithA
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector.
 	initialBlock:=[ ^ 1 k a: {k} ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
 	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 2.
@@ -234,7 +232,7 @@ PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithA
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector.
 	initialBlock:=[ ^ 1 k a: {b} ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
 	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
@@ -253,7 +251,7 @@ PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithS
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector.
 	initialBlock:=[ ^ 1 k a: b ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
 	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
@@ -272,7 +270,7 @@ PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithUnaryOuterNode [
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector.
 	initialBlock:=[ ^ 1 k a ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
 	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
@@ -291,7 +289,7 @@ PlainCodeVisitorTest >> testInstanceVariableSet [
 	anInstanceVariable := 'truc' .
 	
 	initialBlock := [	^ anInstanceVariable ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	[
 		self assert: anInstanceVariable isNotNil.
@@ -314,7 +312,7 @@ PlainCodeVisitorTest >> testInstanceVariableSetWithEmptyArrayForMessage [
 	anInstanceVariable := {} .
 	
 	initialBlock := [	^ 1 anInstanceVariable ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	[
 		self assert: anInstanceVariable isNotNil.
@@ -336,7 +334,7 @@ PlainCodeVisitorTest >> testInstanceVariableSetWithEmptyArrayForVariable [
 	anInstanceVariable := {} .
 	
 	initialBlock := [	^ anInstanceVariable ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	[
 		self assert: anInstanceVariable isNotNil.
@@ -358,7 +356,7 @@ PlainCodeVisitorTest >> testInstanceVariableUnset [
 	anInstanceVariable := nil.
 	
 	initialBlock := [	^ anInstanceVariable ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: anInstanceVariable isNil.
 	self assert: (self countID:'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
@@ -373,7 +371,7 @@ PlainCodeVisitorTest >> testKeywordMessageOneArg [
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector:.
 	initialBlock:=[ ^ 1 k:{ 1 } ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
 	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
@@ -389,7 +387,7 @@ PlainCodeVisitorTest >> testKeywordMessageTwoArgs [
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector:withAnotherArg:.
 	initialBlock:=[ ^ 1 k:{ 1 . 2 } ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
 	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
@@ -406,7 +404,7 @@ PlainCodeVisitorTest >> testKeywordMessageWithTempSet [
 	k := #aSelector:.
 	t := 'aValue'.
 	initialBlock:=[ ^ t k:{ t } ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
 	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
@@ -430,7 +428,7 @@ PlainCodeVisitorTest >> testLeftSideAssignementVariableNodeExpand [
 	a:={ 'druss' . 'waylander' }.
 	
 	initialBlock := [	a:=#aMessage ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: a isArray.
 	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
@@ -446,7 +444,7 @@ PlainCodeVisitorTest >> testMiddleUnarySelectorChangeWithUnaryOuterNode [
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector.
 	initialBlock:=[ ^ 1 b k a ].
-	modifiedBlockAST := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlockAST := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
 	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
@@ -465,7 +463,7 @@ PlainCodeVisitorTest >> testOuterUnarySelectorChange [
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := #aSelector.
 	initialBlock:=[ ^ 1 a k ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
 	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
@@ -484,7 +482,7 @@ PlainCodeVisitorTest >> testReceiverVariableNodeExpand [
 	a:={ 'druss' . 'waylander' }.
 	
 	initialBlock := [	a aMessage ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: a isArray.
 	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
@@ -505,7 +503,7 @@ PlainCodeVisitorTest >> testReplaceBothAssignementSidesInReturn [
 	a := {'waylander'}.
 	b := { 'druss' }.
 	initialBlock := [ ^ a := b ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: a size equals: 1.
 	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
@@ -528,7 +526,7 @@ PlainCodeVisitorTest >> testReplaceInnerArgumentWithSetValue [
 	
 	initialBlock := [:anArg|	^ anArg ].
 	argReplacement := Dictionary new add: 'anArg' -> anotherArg ; yourself.
-	modifiedBlock := plainCode generateCode: #aMethod: withBody: initialBlock andArguments: argReplacement.
+	modifiedBlock := #aMethod: asMethodWithBody: initialBlock withArguments: argReplacement.
 	
 	self assert: anotherArg isNotNil.
 	self assert: (self countID:'anArg' in: initialBlock sourceNode) equals: 2.
@@ -547,7 +545,7 @@ PlainCodeVisitorTest >> testReplaceInnerArgumentWithUnsetValue [
 	
 	initialBlock := [:anArg|	^ anArg ].
 	argReplacement := Dictionary new add: 'anArg' -> anotherArg ; yourself.
-	modifiedBlock := plainCode generateCode: #aMethod: withBody: initialBlock andArguments: argReplacement.
+	modifiedBlock := #aMethod: asMethodWithBody: initialBlock withArguments: argReplacement.
 	
 	self assert: anotherArg isNil.
 	self assert: (self countID:'anArg' in: initialBlock sourceNode) equals: 2.
@@ -563,7 +561,7 @@ PlainCodeVisitorTest >> testReplaceOneBinaryKeywordSelectorByTwoBinaryKeywordSel
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := { #truc:truc: . #truc2:truc2: }.
 	initialBlock:=[ 1 k:{ 1 . 2 } ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
 	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
@@ -579,7 +577,7 @@ PlainCodeVisitorTest >> testReplaceOneBinarySelectorByTwoBinarySelectors [
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := { #- . #+ }.
 	initialBlock:=[ 1 k:{1} ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
 	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
@@ -595,7 +593,7 @@ PlainCodeVisitorTest >> testReplaceOneKeywordSelectorByTwoKeywordSelectors [
 	"The variable is instanciated with a value, it should therefore be replaced"
 	u := { #truc: . #truc2: }.
 	initialBlock:=[ 1 u:{1} ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: u isNotNil.
 	self assert: (self countID:'u:' in: initialBlock sourceNode) equals: 1.
@@ -611,7 +609,7 @@ PlainCodeVisitorTest >> testReplaceOneTernaryKeywordSelectorByTwoTernaryKeywordS
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := { #truc:truc:truc: . #truc2:truc2:truc2: }.
 	initialBlock:=[ 1 k:{ 0. 1 . 2 } ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
 	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
@@ -627,7 +625,7 @@ PlainCodeVisitorTest >> testReplaceOneUnaryKeywordSelectorByTwoUnaryKeywordSelec
 	"The variable is instanciated with a value, it should therefore be replaced"
 	k := { #truc: . #truc2: }.
 	initialBlock:=[ 1 k:{1} ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
 	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
@@ -643,7 +641,7 @@ PlainCodeVisitorTest >> testReplaceOneUnarySelectorByTwoUnarySelectors [
 	"The variable is instanciated with a value, it should therefore be replaced"
 	u := { #truc . #truc2 }.
 	initialBlock:=[ 1 u ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: u isNotNil.
 	self assert: (self countID:'u' in: initialBlock sourceNode) equals: 1.
@@ -663,7 +661,7 @@ PlainCodeVisitorTest >> testRighSideAssignementVariableNodeExpand [
 	a:={ 'druss' . 'waylander' }.
 	
 	initialBlock := [	b:=a. ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: a isArray.
 	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
@@ -679,7 +677,7 @@ PlainCodeVisitorTest >> testTempSetOnSelectorAndVariable [
 	"The variable is instanciated with a value, it should therefore be replaced"
 	t := 'aValue'.
 	initialBlock:=[ ^ t t].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: t isNotNil.
 	self assert: (self countID:'t' in: initialBlock sourceNode) equals: 2.
@@ -694,7 +692,7 @@ PlainCodeVisitorTest >> testTempUnsetOnSelectorAndVariable [
 	"The variable is instanciated with a value, it should therefore be replaced"
 	t := nil.
 	initialBlock:=[ ^ t t].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: t isNil.
 	self assert: (self countID:'t' in: initialBlock sourceNode) equals: 2.
@@ -713,7 +711,7 @@ PlainCodeVisitorTest >> testTryExpandOnAReturn [
 	a:={ 'druss' . 'waylander' }.
 	
 	initialBlock := [	^ a ].
-	self should: [ plainCode generateCode: #aMethod withBody: initialBlock ] raise:ExpandReturnError.	
+	self should: [ #aMethod asMethodWithBody: initialBlock ] raise:ExpandReturnError.	
 ]
 
 { #category : #'test-variable-expand' }
@@ -725,7 +723,7 @@ PlainCodeVisitorTest >> testTryExpandOneVariableOnAReturn [
 	which is obviously not valid"
 	a := {'waylander'}.
 	initialBlock := [ ^ a ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: a size equals: 1.
 	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
@@ -741,7 +739,7 @@ PlainCodeVisitorTest >> testUnarySelector [
 	"The variable is instanciated with a value, it should therefore be replaced"
 	u := #truc.
 	initialBlock:=[ ^ 1 u ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: u isNotNil.
 	self assert: (self countID:'u' in: initialBlock sourceNode) equals: 1.
@@ -756,7 +754,7 @@ PlainCodeVisitorTest >> testUnarySelectorWithEmptyArguments [
 	"The variable is instanciated with a value, it should therefore be replaced"
 	u := #truc.
 	initialBlock:=[ ^ 1 u:{} ].
-	modifiedBlock := plainCode generateCode: #aMethod withBody: initialBlock.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: u isNotNil.
 	self assert: (self countID:'u:' in: initialBlock sourceNode) equals: 1.
