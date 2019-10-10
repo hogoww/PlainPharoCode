@@ -59,7 +59,10 @@ PCBlocks >> asMethod: aSelector [
 
 { #category : #ast }
 PCBlocks >> asMethod: aSelector withArguments: aDictionary [
-	^ self asBlock: aDictionary.
+	| blockAST |
+	blockAST := self asBlock: aDictionary.
+	
+	^RBMethodNode  selector: aSelector arguments: blockAST arguments body: blockAST body
 ]
 
 { #category : #ast }

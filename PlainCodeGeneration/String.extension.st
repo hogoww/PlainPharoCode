@@ -7,5 +7,5 @@ String >> asMethodWithBody: aBlock [
 
 { #category : #'*PlainCodeGeneration' }
 String >> asMethodWithBody: aBlock withArguments: aDictionary [
-	^ aBlock asMethod: self withArguments: aDictionary
+	^ aBlock asPlainCodeBC asMethod: self withArguments: aDictionary
 ]

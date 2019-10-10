@@ -26,7 +26,7 @@ BlockClosure >> asMethod: aSelector [
 
 { #category : #'*PlainCodeGeneration' }
 BlockClosure >> asMethod: aSelector withArguments: aDictionary [
-	^ PlainCodeVisitor new generateCode: aSelector withBody: self andArguments: aDictionary
+	^ self asPlainCodeBC asMethod: aSelector withArguments: aDictionary
 ]
 
 { #category : #'*PlainCodeGeneration' }
@@ -34,10 +34,4 @@ BlockClosure >> asPlainCodeBC [
 	^ PCBlocks new
 		+ self ;
 		yourself
-]
-
-{ #category : #'*PlainCodeGeneration' }
-BlockClosure >> replaceWithContextAndArguments: aDictionaryForArguments [
-	^ self asPlainCodeBC
-		replaceWithContextAndArguments: aDictionaryForArguments
 ]
