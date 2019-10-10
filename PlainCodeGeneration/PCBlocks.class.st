@@ -10,7 +10,7 @@ Class {
 
 { #category : #concatenation }
 PCBlocks >> + aBlock [
-	blocks add: aBlock
+	self add: aBlock
 ]
 
 { #category : #concatenation }
@@ -36,7 +36,7 @@ PCBlocks >> asBlock [
 { #category : #ast }
 PCBlocks >> asBlock: aDictionary [
 	| arguments temporaries statements |
-	asts := OrderedCollection new.
+	
 	asts := blocks collect: [ :aPcBlocks | aPcBlocks doReplacementsWith: aDictionary ].
 	
 	arguments := Set new.

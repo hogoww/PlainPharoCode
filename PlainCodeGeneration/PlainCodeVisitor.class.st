@@ -30,7 +30,7 @@ Class {
 
 { #category : #formatting }
 PlainCodeVisitor >> aCodeGeneratorFromBlock: aPlainCodeBlock andArguments: aDictionary [
-	^ aPlainCodeBlock asPlainCodeBC asBlock
+	^ aPlainCodeBlock asPlainCodeBC asBlock: aDictionary
 ]
 
 { #category : #accessing }
