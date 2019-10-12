@@ -158,7 +158,10 @@ PlainCodeVisitor >> variablesNodesVisit: aNode [
 		ifTrue: [ ^ self ].
 	resolvedVariable isArray
 		ifTrue: [ resolvedVariable
-				ifEmpty: [ ^ self ]
+				ifEmpty: [ |statement|
+					statement := aNode statement.
+					statement parent removeNode: statement.
+					^ self ]
 				ifNotEmpty: [ resolvedVariable size > 1
 						ifTrue: [ ^ self variableExpandsInMultipleVariables: aNode ]
 						ifFalse: [ resolvedVariable := resolvedVariable anyOne ] ] ].
@@ -212,12 +215,29 @@ PlainCodeVisitor >> visitMessageNode: aMessageNode [
 	| newSelector |
 	"This will dispatch the message depending if we won't to replace it's selector by one or several messages"
 	super visitMessageNode: aMessageNode.
+	
 	newSelector := self getMessageSelector: aMessageNode selector.
-	newSelector = aMessageNode selector
-		ifTrue: [ ^ self ].	"Nothing to change here !"
+
 	(newSelector isCollection and:[ newSelector isString not])
-		ifFalse: [ self message: aMessageNode withNewSelector: newSelector ]
-		ifTrue: [ newSelector
+		ifFalse: [ 
+			newSelector = aMessageNode selector
+				ifTrue: [ ^ self ].	"Nothing to change here !"
+			self message: aMessageNode withNewSelector: newSelector ]
+		ifTrue: [ 
+			newSelector ifEmpty:[ |statement|
+				statement:= aMessageNode statement.
+				statement parent removeNode:statement.
+				^self ].
+			
+			newSelector size = 1
+				ifTrue:[
+					newSelector first = aMessageNode selector
+					ifTrue: [ ^ self ].	"Nothing to change here !"
+					self message: aMessageNode withNewSelector: newSelector first.
+					^self
+				].
+			"Else, needs to be expanded"
+			newSelector
 				ifNotEmpty: [ self message: aMessageNode expandInMultipleSelectors: newSelector ] ]
 ]
 

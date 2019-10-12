@@ -281,6 +281,25 @@ PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithUnaryOuterNode [
 	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 ]
 
+{ #category : #'tests-messages' }
+PlainCodeVisitorTest >> testInnerUnarySelectorExpandInsideABinarySelector [
+	| k initialBlock modifiedBlock  |
+	"The variable is instanciated with a value, it should therefore be replaced"
+	k := #(druss #waylander).
+	initialBlock:=[ 1 + self a k ].
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
+	
+	self assert: k isNotNil.
+	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID:'k' in: modifiedBlock) equals: 0.
+	self assert: (self countID: #+ in: modifiedBlock) equals: 2.
+	self assert: (self countID: #druss in: modifiedBlock) equals: 1.
+	self assert: (self countID: #waylander in: modifiedBlock) equals: 1.
+	self assert: (self countID:'a' in: modifiedBlock) equals: 2.
+	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+]
+
 { #category : #'tests-variables' }
 PlainCodeVisitorTest >> testInstanceVariableSet [
 	| initialBlock modifiedBlock |
@@ -671,6 +690,29 @@ PlainCodeVisitorTest >> testRighSideAssignementVariableNodeExpand [
 	self assert: (self countID:'druss' in: modifiedBlock) equals: 1.
 	self assert: (self countID:'waylander' in: modifiedBlock) equals: 1.
 	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+]
+
+{ #category : #'tests-variables' }
+PlainCodeVisitorTest >> testSetWithEmptyArrayForComplexMessage [
+	| initialBlock modifiedBlock |
+	"The instance variable is set, therefore should be replaced in the block
+	Since the array is empty, it probably should remove the message alltogether"
+	
+	anInstanceVariable := {} .
+	
+	initialBlock := [	^ 1 + 1 anInstanceVariable ].
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
+	
+	[
+		self assert: anInstanceVariable isNotNil.
+		self assert: (self countID:'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
+		self assert: modifiedBlock statements size equals: 0.
+		self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	] ensure: [
+		anInstanceVariable := nil.
+	]
+	
+	
 ]
 
 { #category : #'tests-mixte' }
