@@ -90,7 +90,7 @@ PlainCodeVisitor >> getMessageSelector: aString [
 PlainCodeVisitor >> getReplacementName: aString [
 	(context lookupSymbol: aString)
 		ifNotNil: [ :value | 
-			value isArray
+			(value isCollection and:[ value isString not])
 				ifTrue: [ ^ value ]
 				ifFalse: [ ^ value asString ] ].
 	^ aString
@@ -215,7 +215,7 @@ PlainCodeVisitor >> visitMessageNode: aMessageNode [
 	newSelector := self getMessageSelector: aMessageNode selector.
 	newSelector = aMessageNode selector
 		ifTrue: [ ^ self ].	"Nothing to change here !"
-	newSelector isArray
+	(newSelector isCollection and:[ newSelector isString not])
 		ifFalse: [ self message: aMessageNode withNewSelector: newSelector ]
 		ifTrue: [ newSelector
 				ifNotEmpty: [ self message: aMessageNode expandInMultipleSelectors: newSelector ] ]
