@@ -100,18 +100,25 @@ PlainCodeVisitor >> getReplacementName: aString [
 PlainCodeVisitor >> message: aMessageNode expandInMultipleSelectors: aCollectionOfSelector [ 
 	| newArguments replacementNodes oom |
 	oom := aMessageNode outerMostMessage.
-	
+
 	oom parent isReturn ifTrue:[ ExpandReturnError signal ].
 	
-	newArguments:=aMessageNode arguments
+	newArguments := aMessageNode arguments
 		ifNotEmpty:[:args| args at:1 ] "we take the ArrayNode's collection directly"
 		ifEmpty:[ OrderedCollection new ]. 
 	newArguments size > 0 ifTrue:[ newArguments := newArguments statements].
 
-	replacementNodes:=	aCollectionOfSelector collect:[:aSelector| 
-			RBMessageNode receiver: aMessageNode receiver
-				selector: aSelector
-				arguments: newArguments
+	replacementNodes := aCollectionOfSelector collect:[:aSelector| | newOom newMessageNode replacementNode |
+			newOom := oom copy.
+			replacementNode := RBMessageNode receiver: aMessageNode receiver
+			selector: aSelector
+			arguments: newArguments.
+			
+			oom = aMessageNode ifTrue:[ replacementNode ]
+			ifFalse:[ 
+					newMessageNode := newOom children detect: [:aNode| aNode = aMessageNode ].
+					newOom replaceNode: newMessageNode withNode: replacementNode.
+					].
 			].
 	oom parent replaceNode:oom withNodes: replacementNodes.
 ]
