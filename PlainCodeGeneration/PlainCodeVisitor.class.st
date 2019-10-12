@@ -30,9 +30,7 @@ Class {
 
 { #category : #formatting }
 PlainCodeVisitor >> aCodeGeneratorFromBlock: aPlainCodeBlock andArguments: aDictionary [
-	| res |
-	res := aPlainCodeBlock replaceWithContextAndArguments: aDictionary.
-	^ res concatenationResult
+	^ aPlainCodeBlock asPlainCodeBC asBlock: aDictionary
 ]
 
 { #category : #accessing }
@@ -92,7 +90,7 @@ PlainCodeVisitor >> getMessageSelector: aString [
 PlainCodeVisitor >> getReplacementName: aString [
 	(context lookupSymbol: aString)
 		ifNotNil: [ :value | 
-			value isArray
+			(value isCollection and:[ value isString not])
 				ifTrue: [ ^ value ]
 				ifFalse: [ ^ value asString ] ].
 	^ aString
@@ -102,18 +100,25 @@ PlainCodeVisitor >> getReplacementName: aString [
 PlainCodeVisitor >> message: aMessageNode expandInMultipleSelectors: aCollectionOfSelector [ 
 	| newArguments replacementNodes oom |
 	oom := aMessageNode outerMostMessage.
-	
+
 	oom parent isReturn ifTrue:[ ExpandReturnError signal ].
 	
-	newArguments:=aMessageNode arguments
+	newArguments := aMessageNode arguments
 		ifNotEmpty:[:args| args at:1 ] "we take the ArrayNode's collection directly"
 		ifEmpty:[ OrderedCollection new ]. 
 	newArguments size > 0 ifTrue:[ newArguments := newArguments statements].
 
-	replacementNodes:=	aCollectionOfSelector collect:[:aSelector| 
-			RBMessageNode receiver: aMessageNode receiver
-				selector: aSelector
-				arguments: newArguments
+	replacementNodes := aCollectionOfSelector collect:[:aSelector| | newOom newMessageNode replacementNode |
+			newOom := oom copy.
+			replacementNode := RBMessageNode receiver: aMessageNode receiver
+			selector: aSelector
+			arguments: newArguments.
+			
+			oom = aMessageNode ifTrue:[ replacementNode ]
+			ifFalse:[ 
+					newMessageNode := newOom children detect: [:aNode| aNode = aMessageNode ].
+					newOom replaceNode: newMessageNode withNode: replacementNode.
+					].
 			].
 	oom parent replaceNode:oom withNodes: replacementNodes.
 ]
@@ -160,7 +165,10 @@ PlainCodeVisitor >> variablesNodesVisit: aNode [
 		ifTrue: [ ^ self ].
 	resolvedVariable isArray
 		ifTrue: [ resolvedVariable
-				ifEmpty: [ ^ self ]
+				ifEmpty: [ |statement|
+					statement := aNode statement.
+					statement parent removeNode: statement.
+					^ self ]
 				ifNotEmpty: [ resolvedVariable size > 1
 						ifTrue: [ ^ self variableExpandsInMultipleVariables: aNode ]
 						ifFalse: [ resolvedVariable := resolvedVariable anyOne ] ] ].
@@ -214,12 +222,29 @@ PlainCodeVisitor >> visitMessageNode: aMessageNode [
 	| newSelector |
 	"This will dispatch the message depending if we won't to replace it's selector by one or several messages"
 	super visitMessageNode: aMessageNode.
+	
 	newSelector := self getMessageSelector: aMessageNode selector.
-	newSelector = aMessageNode selector
-		ifTrue: [ ^ self ].	"Nothing to change here !"
-	newSelector isArray
-		ifFalse: [ self message: aMessageNode withNewSelector: newSelector ]
-		ifTrue: [ newSelector
+
+	(newSelector isCollection and:[ newSelector isString not])
+		ifFalse: [ 
+			newSelector = aMessageNode selector
+				ifTrue: [ ^ self ].	"Nothing to change here !"
+			self message: aMessageNode withNewSelector: newSelector ]
+		ifTrue: [ 
+			newSelector ifEmpty:[ |statement|
+				statement:= aMessageNode statement.
+				statement parent removeNode:statement.
+				^self ].
+			
+			newSelector size = 1
+				ifTrue:[
+					newSelector first = aMessageNode selector
+					ifTrue: [ ^ self ].	"Nothing to change here !"
+					self message: aMessageNode withNewSelector: newSelector first.
+					^self
+				].
+			"Else, needs to be expanded"
+			newSelector
 				ifNotEmpty: [ self message: aMessageNode expandInMultipleSelectors: newSelector ] ]
 ]
 

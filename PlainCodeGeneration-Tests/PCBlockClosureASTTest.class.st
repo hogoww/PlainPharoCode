@@ -12,7 +12,8 @@ PCBlockClosureASTTest >> testBlockClosureConversion [
 	|aPCBlocks|
 	aPCBlocks := [ 3 ] asPlainCodeBC.
 	self assert: aPCBlocks class equals: PCBlocks.
-	self assert: (aPCBlocks blocks at: 1) class equals: BlockClosure.
+	self assert: (aPCBlocks blocks at: 1) class equals: PCBlock.
+	self assert: (aPCBlocks blocks at: 1) block class equals: BlockClosure.
 	
 	
 ]
