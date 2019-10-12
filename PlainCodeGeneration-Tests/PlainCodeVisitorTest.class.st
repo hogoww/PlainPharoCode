@@ -307,7 +307,8 @@ PlainCodeVisitorTest >> testInstanceVariableSet [
 { #category : #'tests-variables' }
 PlainCodeVisitorTest >> testInstanceVariableSetWithEmptyArrayForMessage [
 	| initialBlock modifiedBlock |
-	"The instance variable is set, therefore should be replaced in the block"
+	"The instance variable is set, therefore should be replaced in the block
+	Since the array is empty, it probably should remove the message alltogether"
 	
 	anInstanceVariable := {} .
 	
@@ -317,7 +318,7 @@ PlainCodeVisitorTest >> testInstanceVariableSetWithEmptyArrayForMessage [
 	[
 		self assert: anInstanceVariable isNotNil.
 		self assert: (self countID:'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
-		self assert: (self countID:'anInstanceVariable' in: modifiedBlock) equals: 1.
+		self assert: modifiedBlock statements size equals: 0.
 		self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 	] ensure: [
 		anInstanceVariable := nil.
@@ -329,9 +330,10 @@ PlainCodeVisitorTest >> testInstanceVariableSetWithEmptyArrayForMessage [
 { #category : #'tests-variables' }
 PlainCodeVisitorTest >> testInstanceVariableSetWithEmptyArrayForVariable [
 	| initialBlock modifiedBlock |
-	"The instance variable is set, therefore should be replaced in the block"
+	"The instance variable is set, therefore should be replaced in the block.
+	The array is empty, hence the statement should be removed"
 	
-	anInstanceVariable := {} .
+	anInstanceVariable := {}.
 	
 	initialBlock := [	^ anInstanceVariable ].
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
@@ -339,7 +341,7 @@ PlainCodeVisitorTest >> testInstanceVariableSetWithEmptyArrayForVariable [
 	[
 		self assert: anInstanceVariable isNotNil.
 		self assert: (self countID:'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
-		self assert: (self countID:'anInstanceVariable' in: modifiedBlock) equals: 1.
+		self assert: modifiedBlock statements size equals: 0.
 		self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
 	] ensure: [
 		anInstanceVariable := nil.
