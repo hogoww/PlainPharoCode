@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'block',
-		'arguments'
+		'arguments',
+		'variables'
 	],
 	#category : #'PlainCodeGeneration-format'
 }
@@ -25,6 +26,21 @@ PCBlock >> block [
 
 { #category : #accessing }
 PCBlock >> block: aBlock [
+	| tempNames receiver |
+	variables := Dictionary new: aBlock outerContext numTemps.
+
+	"get the temps values"
+	tempNames := aBlock outerContext tempNames.
+	1 to: aBlock outerContext numTemps do:[:index|
+		variables at: (tempNames at: index) put: (aBlock outerContext tempNamed: (tempNames at:index)).
+		].
+	
+	"get the instance variables values"
+	receiver := aBlock outerContext receiver.
+	receiver class allInstVarNames do:[:anIVName|
+		variables at: anIVName put: (receiver instVarNamed: anIVName).
+		].
+	
 	block := aBlock
 ]
 
@@ -32,7 +48,7 @@ PCBlock >> block: aBlock [
 PCBlock >> doReplacementsWith: aDictionary [
 	| visitor resAST |
 	visitor := PlainCodeVisitor new
-		context: block outerContext;
+		context: variables ;
 		argumentDictionary:
 			(aDictionary
 				addAll: arguments;
@@ -41,4 +57,14 @@ PCBlock >> doReplacementsWith: aDictionary [
 	resAST := block sourceNode copy.
 	resAST acceptVisitor: visitor.
 	^resAST
+]
+
+{ #category : #accessing }
+PCBlock >> variables [
+	^ variables
+]
+
+{ #category : #accessing }
+PCBlock >> variables: aVariables [
+	variables := aVariables
 ]
