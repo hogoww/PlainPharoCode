@@ -40,7 +40,7 @@ PCBlock >> block: aBlock [
 	receiver class allInstVarNames do:[:anIVName|
 		variables at: anIVName put: (receiver instVarNamed: anIVName).
 		].
-	self halt.
+
 	block := aBlock
 ]
 
