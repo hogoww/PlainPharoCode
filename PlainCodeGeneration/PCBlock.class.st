@@ -31,8 +31,9 @@ PCBlock >> block: aBlock [
 
 	"get the temps values"
 	tempNames := aBlock outerContext tempNames.
-	1 to: aBlock outerContext numTemps do:[:index|
-		variables at: (tempNames at: index) put: (aBlock outerContext tempNamed: (tempNames at:index)).
+	tempNames do:[:aVarName|
+		self halt.
+		variables at: aVarName put: (aBlock outerContext tempNames indexOf: aVarName ).
 		].
 	
 	"get the instance variables values"
@@ -40,6 +41,7 @@ PCBlock >> block: aBlock [
 	receiver class allInstVarNames do:[:anIVName|
 		variables at: anIVName put: (receiver instVarNamed: anIVName).
 		].
+	self halt.
 	
 	block := aBlock
 ]
