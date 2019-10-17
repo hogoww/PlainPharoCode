@@ -1,4 +1,4 @@
-language: smalltalk
+]language: smalltalk
 sudo: false
 
 notifications:
@@ -9,6 +9,7 @@ notifications:
 os:
     - linux
     - osx
+    - windows
 
 smalltalk:
     - Pharo32-7.0
