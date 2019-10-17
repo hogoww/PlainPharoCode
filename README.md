@@ -1,5 +1,5 @@
 # PlainCode
-![Build Status](https://travis-ci.com/hogoww/PlainPharoCode.svg?branch=master)
+[![Build Status](https://travis-ci.com/hogoww/PlainPharoCode.svg?branch=master)](https://travis-ci.com/hogoww/PlainPharoCode)
 [![License](https://img.shields.io/badge/license-GPL-blue.svg)](LICENSE)
 [![Pharo version](https://img.shields.io/badge/Pharo-7.0-%23aac9ff.svg)](https://pharo.org/download)
 [![Pharo version](https://img.shields.io/badge/Pharo-8.0-%23aac9ff.svg)](https://pharo.org/download)
