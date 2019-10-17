@@ -23,8 +23,8 @@ PCBlocks >> add: aBlock withArguments: args [
 	blocks
 		add:
 			(PCBlock new
-				block: aBlock;
-				arguments: args;
+				block: aBlock ;
+				arguments: args ;
 				yourself)
 ]
 
@@ -62,7 +62,7 @@ PCBlocks >> asMethod: aSelector withArguments: aDictionary [
 	| blockAST |
 	blockAST := self asBlock: aDictionary.
 	
-	^RBMethodNode  selector: aSelector arguments: blockAST arguments body: blockAST body
+	^ RBMethodNode  selector: aSelector arguments: blockAST arguments body: blockAST body
 ]
 
 { #category : #ast }

@@ -88,7 +88,7 @@ PlainCodeVisitor >> getMessageSelector: aString [
 
 { #category : #visiting }
 PlainCodeVisitor >> getReplacementName: aString [
-	(context lookupSymbol: aString)
+	(context at: aString ifAbsent:[ ^ aString ])
 		ifNotNil: [ :value | 
 			(value isCollection and:[ value isString not])
 				ifTrue: [ ^ value ]
@@ -150,7 +150,7 @@ PlainCodeVisitor >> variableExpandsInMultipleVariables: aNode [
 	omm:=aNode parent outerMostMessage.
 	omm parent isReturn ifTrue:[^ExpandReturnError new signal].
 	
-	res:=(context lookupSymbol: aNode name) collect:[:aStatement| 
+	res:=(context at: aNode name ifAbsent:[nil]) collect:[:aStatement| 
 		omm copy innerMostMessage receiver: (RBVariableNode named:aStatement)
 		].
 	omm parent replaceNode: omm withNodes: res.
@@ -160,7 +160,7 @@ PlainCodeVisitor >> variableExpandsInMultipleVariables: aNode [
 PlainCodeVisitor >> variablesNodesVisit: aNode [
 	"visits for IV/argument/temporary nodes"
 	| resolvedVariable |
-	resolvedVariable := context lookupSymbol: aNode name.
+	resolvedVariable := context at: aNode name ifAbsent:[ nil ].
 	resolvedVariable isNil
 		ifTrue: [ ^ self ].
 	resolvedVariable isArray
@@ -196,7 +196,7 @@ PlainCodeVisitor >> visitAssignmentNode: anAssignmentNode [
 
 	anAssignmentNode value acceptVisitor:self.
 
-	resolvedName := context lookupSymbol: anAssignmentNode variable name.
+	resolvedName := context at: anAssignmentNode variable name ifAbsent:[ nil ].
 	resolvedName ifNil:[ ^self ].
 	
 	resolvedName isArray ifFalse:[resolvedName := { resolvedName } ].
@@ -224,7 +224,7 @@ PlainCodeVisitor >> visitMessageNode: aMessageNode [
 	super visitMessageNode: aMessageNode.
 	
 	newSelector := self getMessageSelector: aMessageNode selector.
-
+	
 	(newSelector isCollection and:[ newSelector isString not])
 		ifFalse: [ 
 			newSelector = aMessageNode selector
@@ -246,6 +246,11 @@ PlainCodeVisitor >> visitMessageNode: aMessageNode [
 			"Else, needs to be expanded"
 			newSelector
 				ifNotEmpty: [ self message: aMessageNode expandInMultipleSelectors: newSelector ] ]
+]
+
+{ #category : #visiting }
+PlainCodeVisitor >> visitSequenceNode: aMethodNode [
+	super visitSequenceNode: aMethodNode 
 ]
 
 { #category : #visiting }
