@@ -1,5 +1,10 @@
 # PlainCode
 
+[![Build Status](https://travis-ci.com/hogoww/PlainPharoCode.svg?branch=master)
+[![License](https://img.shields.io/badge/license-GPL-blue.svg)](LICENSE)
+[![Pharo version](https://img.shields.io/badge/Pharo-7.0-%23aac9ff.svg)](https://pharo.org/download)
+[![Pharo version](https://img.shields.io/badge/Pharo-8.0-%23aac9ff.svg)](https://pharo.org/download)
+
 Able to generate methods using the pharo syntax in a block rather than strings, or complex node writting.  The variables used in the environment will be replaced by their values if they are set. You can also pass a dictionary to rename the arguments of the nodes.
 
 Two main hooks with the same behavior are available for now:
