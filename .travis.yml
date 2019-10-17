@@ -1,4 +1,4 @@
-]language: smalltalk
+language: smalltalk
 sudo: false
 
 notifications:
