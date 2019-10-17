@@ -6,4 +6,7 @@ SmalltalkCISpec {
             #platforms : [ #pharo ]
         }
     ]
+  #testing : {
+        #categories: [ 'PlainCodeGeneration*' ]
+  }
 }
