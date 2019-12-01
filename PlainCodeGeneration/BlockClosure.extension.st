@@ -30,6 +30,14 @@ BlockClosure >> asMethod: aSelector withArguments: aDictionary [
 ]
 
 { #category : #'*PlainCodeGeneration' }
+BlockClosure >> asPCBlock [
+	^ PCBlock new
+		block: self;
+		yourself
+		
+]
+
+{ #category : #'*PlainCodeGeneration' }
 BlockClosure >> asPlainCodeBC [
 	^ PCBlocks new
 		+ self ;

@@ -21,11 +21,7 @@ PCBlocks >> add: aBlock [
 { #category : #concatenation }
 PCBlocks >> add: aBlock withArguments: args [
 	blocks
-		add:
-			(PCBlock new
-				block: aBlock ;
-				arguments: args ;
-				yourself)
+		add: aBlock asPCBlock
 ]
 
 { #category : #ast }
@@ -72,7 +68,7 @@ PCBlocks >> asPlainCodeBC [
 
 { #category : #ast }
 PCBlocks >> blocks [
-	^blocks
+	^ blocks
 ]
 
 { #category : #ast }

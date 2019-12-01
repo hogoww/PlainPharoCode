@@ -10,6 +10,24 @@ Class {
 }
 
 { #category : #accessing }
+PCBlock >> + anotherBlock [
+	^ self add: anotherBlock
+]
+
+{ #category : #accessing }
+PCBlock >> add: anotherBlock [
+	^ self add: anotherBlock withArguments: {}
+]
+
+{ #category : #accessing }
+PCBlock >> add: aBlock withArguments: argumentsDictionnary [
+	^ PCBlocks new
+		add: self;
+		add: aBlock withArguments: argumentsDictionnary;
+		yourself
+]
+
+{ #category : #accessing }
 PCBlock >> arguments [
 	^ arguments
 ]
@@ -17,6 +35,18 @@ PCBlock >> arguments [
 { #category : #accessing }
 PCBlock >> arguments: aDictionary [
 	arguments := aDictionary
+]
+
+{ #category : #accessing }
+PCBlock >> asPCBlock [
+	^ self
+]
+
+{ #category : #accessing }
+PCBlock >> asPlainCodeBC [
+	^ PCBlocks new
+		add: self;
+		yourself
 ]
 
 { #category : #accessing }
@@ -60,11 +90,16 @@ PCBlock >> doReplacementsWith: aDictionary [
 ]
 
 { #category : #accessing }
+PCBlock >> initialize [
+	arguments := {}
+]
+
+{ #category : #accessing }
 PCBlock >> variables [
 	^ variables
 ]
 
 { #category : #accessing }
-PCBlock >> variables: aVariables [
-	variables := aVariables
+PCBlock >> variables: aCollectionOfBindings [
+	variables := aCollectionOfBindings
 ]
