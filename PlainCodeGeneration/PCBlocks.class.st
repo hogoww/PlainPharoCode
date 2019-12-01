@@ -20,8 +20,9 @@ PCBlocks >> add: aBlock [
 
 { #category : #concatenation }
 PCBlocks >> add: aBlock withArguments: args [
-	blocks
-		add: aBlock asPCBlock
+	blocks add: 
+		(aBlock asPCBlock 
+			arguments: args)
 ]
 
 { #category : #ast }

@@ -98,7 +98,7 @@ PlainCodeVisitorTest >> testExpandInReturnTwoUnary [
 	| u initialBlock |
 	"The variable is instanciated with an array, it should therefore be expanded as two messages. But given that you can't have two return statement in a row, hence, it'll throw an error"
 	u := { #truc . #truc2 }.
-	initialBlock:=[ ^ 1 u ].
+	initialBlock := [ ^ 1 u ].
 
 	self should:[ #aMethod asMethodWithBody: initialBlock ] raise: ExpandReturnError
 ]
