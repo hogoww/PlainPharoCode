@@ -126,14 +126,19 @@ PlainCodeVisitor >> message: aMessageNode expandInMultipleSelectors: aCollection
 { #category : #visiting }
 PlainCodeVisitor >> message: aMessageNode withNewSelector: newSelector [
 	| newArguments replacementNodes |
-	newArguments:=aMessageNode arguments 
-		ifNotEmpty:[:args| args at:1 ]	"we take the ArrayNode's collection directly"
+	newArguments := aMessageNode arguments 
+		ifNotEmpty:[:args| | res |
+			res := args at:1.
+			(res isLiteralArray or: [ res isDynamicArray ] )
+				ifTrue: [ res ]	"we take the ArrayNode's collection directly"
+				ifFalse: [ BadArgument new expected: #(RBLiteralArrayNode RBArrayNode) ; result: res class ;  signal ]]
+				"We expect an array node as argument, so we can replace the selector with an arbitrary number of arguments"
 		ifEmpty:[ OrderedCollection new ]. 
-	newArguments size > 0 ifTrue:[ newArguments := newArguments statements].
+	newArguments size > 0 ifTrue:[ newArguments := newArguments statements ].
 
-	replacementNodes:=	RBMessageNode receiver: aMessageNode receiver
-				selector: newSelector
-				arguments: newArguments.
+	replacementNodes := RBMessageNode receiver: aMessageNode receiver
+		selector: newSelector
+		arguments: newArguments.
 	
 	aMessageNode parent replaceNode:aMessageNode withNode: replacementNodes.
 ]

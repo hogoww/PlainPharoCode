@@ -60,6 +60,24 @@ PlainCodeVisitorTest >> setUp [
 ]
 
 { #category : #'tests-messages' }
+PlainCodeVisitorTest >> testBinaryKeywordsArgumentBad [
+	| b initialBlock |
+	"The variable is instanciated with a value, it should therefore be replaced"
+	b := #- .
+	initialBlock:=[ ^ 1 b: 1 ].
+	self should: [ initialBlock asMethod: #aMethod ] raise: BadArgument
+]
+
+{ #category : #'tests-messages' }
+PlainCodeVisitorTest >> testBinaryKeywordsArgumentGood [
+	| b initialBlock |
+	"The variable is instanciated with a value, it should therefore be replaced"
+	b := #- .
+	initialBlock:=[ ^ 1 b: { 1 } ].
+	self shouldnt: [ initialBlock asMethod: #aMethod ] raise: BadArgument
+]
+
+{ #category : #'tests-messages' }
 PlainCodeVisitorTest >> testBinarySelectors [
 	| b initialBlock modifiedBlock |
 	"The variable is instanciated with a value, it should therefore be replaced"
