@@ -25,10 +25,10 @@ PlainCodeVisitorTest >> aTestExternargumentSet:anArg [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 		
 	self assert: anArg isNotNil.
-	self assert: (self countID:'anArg' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'anArg' in: modifiedBlock) equals: 0. 
-	self assert: (self countID:'truc' in: modifiedBlock) equals: 1. 
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'anArg' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'anArg' in: modifiedBlock) equals: 0. 
+	self assert: (self countID: 'truc' in: modifiedBlock) equals: 1. 
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-variables' }
@@ -38,19 +38,19 @@ PlainCodeVisitorTest >> aTestExternargumentUnSet:anArg [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: anArg isNil.
-	self assert: (self countID:'anArg' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'anArg' in: modifiedBlock) equals: 1. 
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'anArg' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'anArg' in: modifiedBlock) equals: 1. 
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #running }
 PlainCodeVisitorTest >> countID: anID in: aNode [
 	| visitor |
-	visitor:= RBIDCounterVisitor new 
+	visitor := RBIDCounterVisitor new 
 		anID: anID;
 		yourself.
 	aNode acceptVisitor: visitor.
-	^visitor count.
+	^ visitor count
 ]
 
 { #category : #running }
@@ -69,10 +69,10 @@ PlainCodeVisitorTest >> testBinarySelectors [
 	"Expected: [^1-1 ]".
 	
 	self assert: b isNotNil.
-	self assert: (self countID:'b:' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'b:' in: modifiedBlock) equals: 0.
+	self assert: (self countID: 'b:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'b:' in: modifiedBlock) equals: 0.
 	self assert: (self countID: #- in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'test-message-expand' }
@@ -82,17 +82,17 @@ PlainCodeVisitorTest >> testExpandInReturnTwoUnary [
 	u := { #truc . #truc2 }.
 	initialBlock:=[ ^ 1 u ].
 
-	self should:[ #aMethod asMethodWithBody: initialBlock ] raise:ExpandReturnError.
+	self should:[ #aMethod asMethodWithBody: initialBlock ] raise: ExpandReturnError
 ]
 
 { #category : #'tests-variables' }
 PlainCodeVisitorTest >> testExternArgumentSet [
-	self aTestExternargumentSet: 'truc'.
+	self aTestExternargumentSet: 'truc'
 ]
 
 { #category : #'tests-variables' }
 PlainCodeVisitorTest >> testExternArgumentUnSet [
-	self aTestExternargumentUnSet: nil.
+	self aTestExternargumentUnSet: nil
 ]
 
 { #category : #'tests-variables' }
@@ -105,12 +105,11 @@ PlainCodeVisitorTest >> testExternTemporarySet [
 	"Expected: [ ^truc ]"
 	
 	self assert: t isNotNil.
-	self assert: (self countID:'t' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'t' in: modifiedBlock) equals: 0. 
-	self assert: (self countID:'truc' in: modifiedBlock) equals: 1.
+	self assert: (self countID: 't' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 't' in: modifiedBlock) equals: 0. 
+	self assert: (self countID: 'truc' in: modifiedBlock) equals: 1.
 	
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
-	
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-variables' }
@@ -121,10 +120,10 @@ PlainCodeVisitorTest >> testExternTemporaryUnset [
 	modifiedBlock := initialBlock asMethod: #aMethod.
 	
 	self assert: t isNil.
-	self assert: (self countID:'t' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'t' in: modifiedBlock) equals: 1. 
+	self assert: (self countID: 't' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 't' in: modifiedBlock) equals: 1. 
 	
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-variables' }
@@ -134,10 +133,10 @@ PlainCodeVisitorTest >> testInnerArgument [
 	initialBlock:=[:anArg | ^ anArg ].
 	modifiedBlock := #aMethod: asMethodWithBody: initialBlock.
 	
-	self assert: (self countID:'anArg' in: initialBlock sourceNode) equals: 2.
-	self assert: (self countID:'anArg' in: modifiedBlock) equals: 2. 
+	self assert: (self countID: 'anArg' in: initialBlock sourceNode) equals: 2.
+	self assert: (self countID: 'anArg' in: modifiedBlock) equals: 2. 
 	
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'test-message-expand' }
@@ -149,11 +148,11 @@ PlainCodeVisitorTest >> testInnerReplaceOneTernaryKeywordSelectorByTwoTernaryKey
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
-	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'k:' in: modifiedBlock) equals: 0.
-	self assert: (self countID:#truc: in: modifiedBlock) equals: 1.
-	self assert: (self countID:#truc2: in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'k:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'k:' in: modifiedBlock) equals: 0.
+	self assert: (self countID: #truc: in: modifiedBlock) equals: 1.
+	self assert: (self countID: #truc2: in: modifiedBlock) equals: 1.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-variables' }
@@ -163,10 +162,10 @@ PlainCodeVisitorTest >> testInnerTemporary [
 	initialBlock:=[ |t| ^ t ].
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
-	self assert: (self countID:'t' in: initialBlock sourceNode) equals: 2.
-	self assert: (self countID:'t' in: modifiedBlock) equals: 2. 
+	self assert: (self countID: 't' in: initialBlock sourceNode) equals: 2.
+	self assert: (self countID: 't' in: modifiedBlock) equals: 2. 
 	
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-messages' }
@@ -178,14 +177,14 @@ PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithOuterKeywordMessage [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
-	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'a:' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'b' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'k' in: modifiedBlock) equals: 0.	
+	self assert: (self countID: 'k' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'a:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'b' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'k' in: modifiedBlock) equals: 0.	
 	self assert: (self countID: #aSelector in: modifiedBlock) equals: 1.
-	self assert: (self countID:'a:' in: modifiedBlock) equals: 1.
-	self assert: (self countID:'b' in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'a:' in: modifiedBlock) equals: 1.
+	self assert: (self countID: 'b' in: modifiedBlock) equals: 1.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-messages' }
@@ -198,15 +197,15 @@ PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithA
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
-	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'a:' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'b' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'k' in: modifiedBlock) equals: 0.
-	self assert: (self countID:'b' in: modifiedBlock) equals: 0.
+	self assert: (self countID: 'k' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'a:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'b' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'k' in: modifiedBlock) equals: 0.
+	self assert: (self countID: 'b' in: modifiedBlock) equals: 0.
 	self assert: (self countID: #aSelector in: modifiedBlock) equals: 1.
-	self assert: (self countID:'a:' in: modifiedBlock) equals: 1.
-	self assert: (self countID:'druss' in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'a:' in: modifiedBlock) equals: 1.
+	self assert: (self countID: 'druss' in: modifiedBlock) equals: 1.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-messages' }
@@ -218,12 +217,12 @@ PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithA
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
-	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 2.
-	self assert: (self countID:'a:' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'k' in: modifiedBlock) equals: 0.
+	self assert: (self countID: 'k' in: initialBlock sourceNode) equals: 2.
+	self assert: (self countID: 'a:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'k' in: modifiedBlock) equals: 0.
 	self assert: (self countID: #aSelector in: modifiedBlock) equals: 2.
-	self assert: (self countID:'a:' in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'a:' in: modifiedBlock) equals: 1.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-messages' }
@@ -235,14 +234,14 @@ PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithA
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
-	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'a:' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'b' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'k' in: modifiedBlock) equals: 0.	
+	self assert: (self countID: 'k' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'a:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'b' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'k' in: modifiedBlock) equals: 0.	
 	self assert: (self countID: #aSelector in: modifiedBlock) equals: 1.
-	self assert: (self countID:'a:' in: modifiedBlock) equals: 1.
-	self assert: (self countID:'b' in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'a:' in: modifiedBlock) equals: 1.
+	self assert: (self countID: 'b' in: modifiedBlock) equals: 1.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-messages' }
@@ -254,14 +253,14 @@ PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithOuterKeywordMessageWithS
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
-	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'a:' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'b' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'k' in: modifiedBlock) equals: 0.	
+	self assert: (self countID: 'k' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'a:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'b' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'k' in: modifiedBlock) equals: 0.	
 	self assert: (self countID: #aSelector in: modifiedBlock) equals: 1.
-	self assert: (self countID:'a:' in: modifiedBlock) equals: 1.
-	self assert: (self countID:'b' in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'a:' in: modifiedBlock) equals: 1.
+	self assert: (self countID: 'b' in: modifiedBlock) equals: 1.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-messages' }
@@ -273,12 +272,12 @@ PlainCodeVisitorTest >> testInnerUnarySelectorChangeWithUnaryOuterNode [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
-	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'k' in: modifiedBlock) equals: 0.	
+	self assert: (self countID: 'k' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'k' in: modifiedBlock) equals: 0.	
 	self assert: (self countID: #aSelector in: modifiedBlock) equals: 1.
-	self assert: (self countID:'a' in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'a' in: modifiedBlock) equals: 1.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-messages' }
@@ -290,14 +289,14 @@ PlainCodeVisitorTest >> testInnerUnarySelectorExpandInsideABinarySelector [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
-	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'k' in: modifiedBlock) equals: 0.
+	self assert: (self countID: 'k' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'k' in: modifiedBlock) equals: 0.
 	self assert: (self countID: #+ in: modifiedBlock) equals: 2.
 	self assert: (self countID: #druss in: modifiedBlock) equals: 1.
 	self assert: (self countID: #waylander in: modifiedBlock) equals: 1.
-	self assert: (self countID:'a' in: modifiedBlock) equals: 2.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'a' in: modifiedBlock) equals: 2.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-variables' }
@@ -312,15 +311,13 @@ PlainCodeVisitorTest >> testInstanceVariableSet [
 	
 	[
 		self assert: anInstanceVariable isNotNil.
-		self assert: (self countID:'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
-		self assert: (self countID:'anInstanceVariable' in: modifiedBlock) equals: 0. 
-		self assert: (self countID:'truc' in: modifiedBlock) equals: 1.
-		self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+		self assert: (self countID: 'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
+		self assert: (self countID: 'anInstanceVariable' in: modifiedBlock) equals: 0. 
+		self assert: (self countID: 'truc' in: modifiedBlock) equals: 1.
+		self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 	] ensure: [
 		anInstanceVariable := nil.
 	]
-	
-	
 ]
 
 { #category : #'tests-variables' }
@@ -336,14 +333,12 @@ PlainCodeVisitorTest >> testInstanceVariableSetWithEmptyArrayForMessage [
 	
 	[
 		self assert: anInstanceVariable isNotNil.
-		self assert: (self countID:'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
+		self assert: (self countID: 'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
 		self assert: modifiedBlock statements size equals: 0.
-		self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+		self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 	] ensure: [
 		anInstanceVariable := nil.
 	]
-	
-	
 ]
 
 { #category : #'tests-variables' }
@@ -359,14 +354,12 @@ PlainCodeVisitorTest >> testInstanceVariableSetWithEmptyArrayForVariable [
 	
 	[
 		self assert: anInstanceVariable isNotNil.
-		self assert: (self countID:'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
+		self assert: (self countID: 'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
 		self assert: modifiedBlock statements size equals: 0.
-		self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+		self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 	] ensure: [
 		anInstanceVariable := nil.
 	]
-	
-	
 ]
 
 { #category : #'tests-variables' }
@@ -380,10 +373,10 @@ PlainCodeVisitorTest >> testInstanceVariableUnset [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: anInstanceVariable isNil.
-	self assert: (self countID:'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'anInstanceVariable' in: modifiedBlock) equals: 1. 
+	self assert: (self countID: 'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'anInstanceVariable' in: modifiedBlock) equals: 1. 
 	
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-messages' }
@@ -395,11 +388,11 @@ PlainCodeVisitorTest >> testKeywordMessageOneArg [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
-	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'k:' in: modifiedBlock) equals: 0.
-	self assert: (self countID:#aSelector: in: modifiedBlock) equals: 1.
+	self assert: (self countID: 'k:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'k:' in: modifiedBlock) equals: 0.
+	self assert: (self countID: #aSelector: in: modifiedBlock) equals: 1.
 	
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-messages' }
@@ -411,11 +404,11 @@ PlainCodeVisitorTest >> testKeywordMessageTwoArgs [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
-	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'k:' in: modifiedBlock) equals: 0.
+	self assert: (self countID: 'k:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'k:' in: modifiedBlock) equals: 0.
 	self assert: (self countID: #aSelector:withAnotherArg: in: modifiedBlock) equals: 1.
 	
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-mixte' }
@@ -428,17 +421,16 @@ PlainCodeVisitorTest >> testKeywordMessageWithTempSet [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
-	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'k:' in: modifiedBlock) equals: 0.
-	self assert: (self countID:#aSelector: in: modifiedBlock) equals: 1.
+	self assert: (self countID: 'k:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'k:' in: modifiedBlock) equals: 0.
+	self assert: (self countID: #aSelector: in: modifiedBlock) equals: 1.
 	
 	self assert: t isNotNil.
-	self assert: (self countID:'t' in: initialBlock sourceNode) equals: 2.
-	self assert: (self countID:'t' in: modifiedBlock) equals: 0. 
-	self assert: (self countID:'aValue' in: modifiedBlock) equals: 2.
+	self assert: (self countID: 't' in: initialBlock sourceNode) equals: 2.
+	self assert: (self countID: 't' in: modifiedBlock) equals: 0. 
+	self assert: (self countID: 'aValue' in: modifiedBlock) equals: 2.
 	
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
-	
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'test-variable-expand' }
@@ -452,11 +444,11 @@ PlainCodeVisitorTest >> testLeftSideAssignementVariableNodeExpand [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: a isArray.
-	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'druss' in: modifiedBlock) equals: 1.
-	self assert: (self countID:'waylander' in: modifiedBlock) equals: 1.
+	self assert: (self countID: 'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'druss' in: modifiedBlock) equals: 1.
+	self assert: (self countID: 'waylander' in: modifiedBlock) equals: 1.
 	self assert: (self countID: #aMessage in: modifiedBlock) equals: 2.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-messages' }
@@ -468,14 +460,14 @@ PlainCodeVisitorTest >> testMiddleUnarySelectorChangeWithUnaryOuterNode [
 	modifiedBlockAST := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
-	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'b' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'k' in: modifiedBlockAST) equals: 0.	
+	self assert: (self countID: 'k' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'b' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'k' in: modifiedBlockAST) equals: 0.	
 	self assert: (self countID: #aSelector in: modifiedBlockAST) equals: 1.
-	self assert: (self countID:'a' in: modifiedBlockAST) equals: 1.
-	self assert: (self countID:'b' in: modifiedBlockAST) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlockAST asString] raise:Error.
+	self assert: (self countID: 'a' in: modifiedBlockAST) equals: 1.
+	self assert: (self countID: 'b' in: modifiedBlockAST) equals: 1.
+	self shouldnt: [ parser parseMethod: modifiedBlockAST asString ] raise: Error
 ]
 
 { #category : #'tests-messages' }
@@ -487,12 +479,12 @@ PlainCodeVisitorTest >> testOuterUnarySelectorChange [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
-	self assert: (self countID:'k' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'k' in: modifiedBlock) equals: 0.	
+	self assert: (self countID: 'k' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'k' in: modifiedBlock) equals: 0.	
 	self assert: (self countID: #aSelector in: modifiedBlock) equals: 1.
-	self assert: (self countID:'a' in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'a' in: modifiedBlock) equals: 1.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'test-variable-expand' }
@@ -506,12 +498,12 @@ PlainCodeVisitorTest >> testReceiverVariableNodeExpand [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: a isArray.
-	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'a' in: modifiedBlock) equals: 0.
-	self assert: (self countID:'druss' in: modifiedBlock) equals: 1.
-	self assert: (self countID:'waylander' in: modifiedBlock) equals: 1.
+	self assert: (self countID: 'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'a' in: modifiedBlock) equals: 0.
+	self assert: (self countID: 'druss' in: modifiedBlock) equals: 1.
+	self assert: (self countID: 'waylander' in: modifiedBlock) equals: 1.
 	self assert: (self countID: #aMessage in: modifiedBlock) equals: 2.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'test-variable-expand' }
@@ -527,15 +519,15 @@ PlainCodeVisitorTest >> testReplaceBothAssignementSidesInReturn [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: a size equals: 1.
-	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'b' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'a' in: modifiedBlock) equals: 0. 
-	self assert: (self countID:'b' in: modifiedBlock) equals: 0. 
-	self assert: (self countID:'waylander' in: modifiedBlock) equals: 1.
-	self assert: (self countID:'druss' in: modifiedBlock) equals: 1. 
+	self assert: (self countID: 'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'b' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'a' in: modifiedBlock) equals: 0. 
+	self assert: (self countID: 'b' in: modifiedBlock) equals: 0. 
+	self assert: (self countID: 'waylander' in: modifiedBlock) equals: 1.
+	self assert: (self countID: 'druss' in: modifiedBlock) equals: 1.
 
 	
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-variables' }
@@ -550,11 +542,11 @@ PlainCodeVisitorTest >> testReplaceInnerArgumentWithSetValue [
 	modifiedBlock := #aMethod: asMethodWithBody: initialBlock withArguments: argReplacement.
 	
 	self assert: anotherArg isNotNil.
-	self assert: (self countID:'anArg' in: initialBlock sourceNode) equals: 2.
-	self assert: (self countID:'anArg' in: modifiedBlock) equals: 0.
-	self assert: (self countID:'something' in: modifiedBlock) equals: 2. 
+	self assert: (self countID: 'anArg' in: initialBlock sourceNode) equals: 2.
+	self assert: (self countID: 'anArg' in: modifiedBlock) equals: 0.
+	self assert: (self countID: 'something' in: modifiedBlock) equals: 2. 
 	
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-variables' }
@@ -569,11 +561,11 @@ PlainCodeVisitorTest >> testReplaceInnerArgumentWithUnsetValue [
 	modifiedBlock := #aMethod: asMethodWithBody: initialBlock withArguments: argReplacement.
 	
 	self assert: anotherArg isNil.
-	self assert: (self countID:'anArg' in: initialBlock sourceNode) equals: 2.
-	self assert: (self countID:'anArg' in: modifiedBlock) equals: 2.
-	self assert: (self countID:'something' in: modifiedBlock) equals: 0. 
+	self assert: (self countID: 'anArg' in: initialBlock sourceNode) equals: 2.
+	self assert: (self countID: 'anArg' in: modifiedBlock) equals: 2.
+	self assert: (self countID: 'something' in: modifiedBlock) equals: 0. 
 	
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'test-message-expand' }
@@ -585,11 +577,11 @@ PlainCodeVisitorTest >> testReplaceOneBinaryKeywordSelectorByTwoBinaryKeywordSel
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
-	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'k:' in: modifiedBlock) equals: 0.
-	self assert: (self countID:#truc:truc: in: modifiedBlock) equals: 1.
-	self assert: (self countID:#truc2:truc2: in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'k:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'k:' in: modifiedBlock) equals: 0.
+	self assert: (self countID: #truc:truc: in: modifiedBlock) equals: 1.
+	self assert: (self countID: #truc2:truc2: in: modifiedBlock) equals: 1.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'test-message-expand' }
@@ -601,11 +593,11 @@ PlainCodeVisitorTest >> testReplaceOneBinarySelectorByTwoBinarySelectors [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
-	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'k:' in: modifiedBlock) equals: 0.
-	self assert: (self countID:#+ in: modifiedBlock) equals: 1.
-	self assert: (self countID:#- in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'k:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'k:' in: modifiedBlock) equals: 0.
+	self assert: (self countID: #+ in: modifiedBlock) equals: 1.
+	self assert: (self countID: #- in: modifiedBlock) equals: 1.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'test-message-expand' }
@@ -617,11 +609,11 @@ PlainCodeVisitorTest >> testReplaceOneKeywordSelectorByTwoKeywordSelectors [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: u isNotNil.
-	self assert: (self countID:'u:' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'u:' in: modifiedBlock) equals: 0.
-	self assert: (self countID:#truc: in: modifiedBlock) equals: 1.
-	self assert: (self countID:#truc2: in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'u:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'u:' in: modifiedBlock) equals: 0.
+	self assert: (self countID: #truc: in: modifiedBlock) equals: 1.
+	self assert: (self countID: #truc2: in: modifiedBlock) equals: 1.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'test-message-expand' }
@@ -633,11 +625,11 @@ PlainCodeVisitorTest >> testReplaceOneTernaryKeywordSelectorByTwoTernaryKeywordS
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
-	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'k:' in: modifiedBlock) equals: 0.
-	self assert: (self countID:#truc:truc:truc: in: modifiedBlock) equals: 1.
-	self assert: (self countID:#truc2:truc2:truc2: in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'k:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'k:' in: modifiedBlock) equals: 0.
+	self assert: (self countID: #truc:truc:truc: in: modifiedBlock) equals: 1.
+	self assert: (self countID: #truc2:truc2:truc2: in: modifiedBlock) equals: 1.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'test-message-expand' }
@@ -649,11 +641,11 @@ PlainCodeVisitorTest >> testReplaceOneUnaryKeywordSelectorByTwoUnaryKeywordSelec
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: k isNotNil.
-	self assert: (self countID:'k:' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'k:' in: modifiedBlock) equals: 0.
-	self assert: (self countID:#truc: in: modifiedBlock) equals: 1.
-	self assert: (self countID:#truc2: in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'k:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'k:' in: modifiedBlock) equals: 0.
+	self assert: (self countID: #truc: in: modifiedBlock) equals: 1.
+	self assert: (self countID: #truc2: in: modifiedBlock) equals: 1.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'test-message-expand' }
@@ -665,11 +657,11 @@ PlainCodeVisitorTest >> testReplaceOneUnarySelectorByTwoUnarySelectors [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: u isNotNil.
-	self assert: (self countID:'u' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'u' in: modifiedBlock) equals: 0.
-	self assert: (self countID:#truc in: modifiedBlock) equals: 1.
-	self assert: (self countID:#truc2 in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'u' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'u' in: modifiedBlock) equals: 0.
+	self assert: (self countID: #truc in: modifiedBlock) equals: 1.
+	self assert: (self countID: #truc2 in: modifiedBlock) equals: 1.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'test-variable-expand' }
@@ -685,11 +677,11 @@ PlainCodeVisitorTest >> testRighSideAssignementVariableNodeExpand [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: a isArray.
-	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'a' in: modifiedBlock) equals: 0.
-	self assert: (self countID:'druss' in: modifiedBlock) equals: 1.
-	self assert: (self countID:'waylander' in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'a' in: modifiedBlock) equals: 0.
+	self assert: (self countID: 'druss' in: modifiedBlock) equals: 1.
+	self assert: (self countID: 'waylander' in: modifiedBlock) equals: 1.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-variables' }
@@ -705,14 +697,12 @@ PlainCodeVisitorTest >> testSetWithEmptyArrayForComplexMessage [
 	
 	[
 		self assert: anInstanceVariable isNotNil.
-		self assert: (self countID:'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
+		self assert: (self countID: 'anInstanceVariable' in: initialBlock sourceNode) equals: 1.
 		self assert: modifiedBlock statements size equals: 0.
-		self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+		self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 	] ensure: [
 		anInstanceVariable := nil.
 	]
-	
-	
 ]
 
 { #category : #'tests-mixte' }
@@ -724,10 +714,10 @@ PlainCodeVisitorTest >> testTempSetOnSelectorAndVariable [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: t isNotNil.
-	self assert: (self countID:'t' in: initialBlock sourceNode) equals: 2.
-	self assert: (self countID:'t' in: modifiedBlock) equals: 0.
-	self assert: (self countID:#aValue in: modifiedBlock) equals: 2.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 't' in: initialBlock sourceNode) equals: 2.
+	self assert: (self countID: 't' in: modifiedBlock) equals: 0.
+	self assert: (self countID: #aValue in: modifiedBlock) equals: 2.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-mixte' }
@@ -739,9 +729,9 @@ PlainCodeVisitorTest >> testTempUnsetOnSelectorAndVariable [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: t isNil.
-	self assert: (self countID:'t' in: initialBlock sourceNode) equals: 2.
-	self assert: (self countID:'t' in: modifiedBlock) equals: 2.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 't' in: initialBlock sourceNode) equals: 2.
+	self assert: (self countID: 't' in: modifiedBlock) equals: 2.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'test-variable-expand' }
@@ -755,7 +745,7 @@ PlainCodeVisitorTest >> testTryExpandOnAReturn [
 	a:={ 'druss' . 'waylander' }.
 	
 	initialBlock := [	^ a ].
-	self should: [ #aMethod asMethodWithBody: initialBlock ] raise:ExpandReturnError.	
+	self should: [ #aMethod asMethodWithBody: initialBlock ] raise: ExpandReturnError
 ]
 
 { #category : #'test-variable-expand' }
@@ -770,11 +760,11 @@ PlainCodeVisitorTest >> testTryExpandOneVariableOnAReturn [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: a size equals: 1.
-	self assert: (self countID:'a' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'a' in: modifiedBlock) equals: 0. 
-	self assert: (self countID:'waylander' in: modifiedBlock) equals: 1.
+	self assert: (self countID: 'a' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'a' in: modifiedBlock) equals: 0. 
+	self assert: (self countID: 'waylander' in: modifiedBlock) equals: 1.
 	
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-messages' }
@@ -786,10 +776,10 @@ PlainCodeVisitorTest >> testUnarySelector [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: u isNotNil.
-	self assert: (self countID:'u' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'u' in: modifiedBlock) equals: 0.
-	self assert: (self countID:#truc in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'u' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'u' in: modifiedBlock) equals: 0.
+	self assert: (self countID: #truc in: modifiedBlock) equals: 1.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
 { #category : #'tests-messages' }
@@ -801,8 +791,8 @@ PlainCodeVisitorTest >> testUnarySelectorWithEmptyArguments [
 	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
 	
 	self assert: u isNotNil.
-	self assert: (self countID:'u:' in: initialBlock sourceNode) equals: 1.
-	self assert: (self countID:'u:' in: modifiedBlock) equals: 0.
-	self assert: (self countID:#truc in: modifiedBlock) equals: 1.
-	self shouldnt: [parser parseMethod: modifiedBlock asString] raise:Error.
+	self assert: (self countID: 'u:' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'u:' in: modifiedBlock) equals: 0.
+	self assert: (self countID: #truc in: modifiedBlock) equals: 1.
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
