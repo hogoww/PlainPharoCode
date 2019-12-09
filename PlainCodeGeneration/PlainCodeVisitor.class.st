@@ -153,7 +153,7 @@ PlainCodeVisitor >> variableExpandsInMultipleVariables: aNode [
 	ifFalse:[^self].
 
 	omm:=aNode parent outerMostMessage.
-	omm parent isReturn ifTrue:[^ExpandReturnError new signal].
+	omm parent isReturn ifTrue:[ ^ ExpandReturnError new signal ].
 	
 	res:=(context at: aNode name ifAbsent:[nil]) collect:[:aStatement| 
 		omm copy innerMostMessage receiver: (RBVariableNode named:aStatement)
@@ -166,8 +166,7 @@ PlainCodeVisitor >> variablesNodesVisit: aNode [
 	"visits for IV/argument/temporary nodes"
 	| resolvedVariable |
 	resolvedVariable := context at: aNode name ifAbsent:[ nil ].
-	resolvedVariable isNil
-		ifTrue: [ ^ self ].
+	resolvedVariable ifNil: [ ^ self ].
 	resolvedVariable isArray
 		ifTrue: [ resolvedVariable
 				ifEmpty: [ |statement|
@@ -220,6 +219,13 @@ PlainCodeVisitor >> visitAssignmentNode: anAssignmentNode [
 { #category : #visiting }
 PlainCodeVisitor >> visitInstanceVariableNode: anInstanceVariable [
 	self variablesNodesVisit: anInstanceVariable
+]
+
+{ #category : #visiting }
+PlainCodeVisitor >> visitLiteralValueNode: aLiteralNode [
+	aLiteralNode value isSymbol ifFalse: [ ^ self ].
+	aLiteralNode value: (self getReplacementName: aLiteralNode value) asSymbol start: 0 stop: 0 
+	"Bogus values, since we're parsing them back before use."
 ]
 
 { #category : #visiting }
