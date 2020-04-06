@@ -20,7 +20,19 @@ PCBlocks >> add: aBlock [
 
 { #category : #concatenation }
 PCBlocks >> add: aBlock withArguments: args [
-	blocks add: 
+	blocks addLast: 
+		(aBlock asPCBlock 
+			arguments: args)
+]
+
+{ #category : #concatenation }
+PCBlocks >> addFirst: aBlock [
+	self addFirst: aBlock withArguments: Dictionary new
+]
+
+{ #category : #concatenation }
+PCBlocks >> addFirst: aBlock withArguments: args [
+	blocks addFirst: 
 		(aBlock asPCBlock 
 			arguments: args)
 ]
