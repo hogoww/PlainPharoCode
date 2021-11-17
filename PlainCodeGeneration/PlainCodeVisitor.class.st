@@ -229,6 +229,14 @@ PlainCodeVisitor >> visitLiteralValueNode: aLiteralNode [
 ]
 
 { #category : #visiting }
+PlainCodeVisitor >> visitLocalVariableNode: aNode [
+	"Every node is redirected to  variable nodes. only is a problem for the argument.
+	This fixes the tool for p9, and the variable refactor"
+	aNode isArgumentVariable ifTrue: [ ^ self visitArgumentNode: aNode ].
+	^ self visitTemporaryNode: aNode 
+]
+
+{ #category : #visiting }
 PlainCodeVisitor >> visitMessageNode: aMessageNode [
 	| newSelector |
 	"This will dispatch the message depending if we won't to replace it's selector by one or several messages"

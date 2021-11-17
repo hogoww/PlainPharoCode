@@ -56,20 +56,21 @@ PCBlock >> block [
 
 { #category : #accessing }
 PCBlock >> block: aBlock [
+
 	| tempNames receiver |
 	variables := Dictionary new: aBlock outerContext numTemps.
 
 	"get the temps values"
 	tempNames := aBlock outerContext tempNames.
-	tempNames do:[:aVarName|
-		variables at: aVarName put: (aBlock outerContext lookupSymbol: aVarName ).
-		].
-	
+	tempNames do: [ :aVarName | 
+		variables
+			at: aVarName
+			put: (aBlock outerContext readVariableNamed: aVarName) ].
+
 	"get the instance variables values"
 	receiver := aBlock outerContext receiver.
-	receiver class allInstVarNames do:[:anIVName|
-		variables at: anIVName put: (receiver instVarNamed: anIVName).
-		].
+	receiver class allInstVarNames do: [ :anIVName | 
+		variables at: anIVName put: (receiver instVarNamed: anIVName) ].
 
 	block := aBlock
 ]

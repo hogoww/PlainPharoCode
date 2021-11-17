@@ -12,7 +12,7 @@ PCBlockClosureASTTest >> testBCToPC [
 	| aPCBlock |
 	aPCBlock := [ 3 ] asPCBlock.
 	self assert: aPCBlock class equals: PCBlock.
-	self assert: aPCBlock block class equals: BlockClosure
+	self assert: (aPCBlock block class inheritsFrom: BlockClosure)
 ]
 
 { #category : #conversion }
@@ -21,7 +21,7 @@ PCBlockClosureASTTest >> testBCToPCBs [
 	aPCBlocks := [ 3 ] asPlainCodeBC.
 	self assert: aPCBlocks class equals: PCBlocks.
 	self assert: (aPCBlocks blocks at: 1) class equals: PCBlock.
-	self assert: (aPCBlocks blocks at: 1) block class equals: BlockClosure.
+	self assert: ((aPCBlocks blocks at: 1) block class inheritsFrom: BlockClosure)
 	
 	
 ]
@@ -148,5 +148,5 @@ PCBlockClosureASTTest >> testPCToPCBs [
 	aPCBlocks := [ 3 ] asPCBlock asPlainCodeBC.
 	self assert: aPCBlocks class equals: PCBlocks.
 	self assert: (aPCBlocks blocks at: 1) class equals: PCBlock.
-	self assert: (aPCBlocks blocks at: 1) block class equals: BlockClosure.
+	self assert: ((aPCBlocks blocks at: 1) block class inheritsFrom: BlockClosure).
 ]
