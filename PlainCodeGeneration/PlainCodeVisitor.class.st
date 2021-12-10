@@ -69,7 +69,7 @@ PlainCodeVisitor >> generateCode: aSelector withBody: aBlock [
 PlainCodeVisitor >> generateCode: aSelector withBody: aBlock andArguments: aDictionnary [
 	| updatedBlock |
 
-	updatedBlock:=self aCodeGeneratorFromBlock:aBlock andArguments: aDictionnary.
+	updatedBlock := self aCodeGeneratorFromBlock: aBlock andArguments: aDictionnary.
 
 	^RBMethodNode
 		selector: aSelector
@@ -82,8 +82,8 @@ PlainCodeVisitor >> getMessageSelector: aString [
 	| newName resolvedName |
 	newName:=aString withoutSuffix: ':'.
 	resolvedName := self getReplacementName: newName.
-	^newName == resolvedName 
-	ifTrue:[ aString ] ifFalse:[ resolvedName ]
+	^ newName == resolvedName 
+		ifTrue:[ aString ] ifFalse:[ resolvedName ]
 ]
 
 { #category : #visiting }
@@ -184,7 +184,6 @@ PlainCodeVisitor >> visitArgumentNode: anArgumentNode [
 	| replacementName |
 	"This will take care of the replacing the inner block's arguments
 	[:b| b ] with the dictionary containing 'b'->a and a:=c will output the method with the body [:c| c ]"
-
 	replacementName:=argumentDictionary at:anArgumentNode name ifAbsent:[
 		^self variablesNodesVisit: anArgumentNode.
 		].
@@ -206,7 +205,7 @@ PlainCodeVisitor >> visitAssignmentNode: anAssignmentNode [
 	resolvedName isArray ifFalse:[resolvedName := { resolvedName } ].
 	expandedNodes := resolvedName collect:[:aName| 
 		|node|
-		node:=anAssignmentNode copy.
+		node := anAssignmentNode copy.
 		node variable name: aName.
 		node.
 		].
@@ -224,7 +223,7 @@ PlainCodeVisitor >> visitInstanceVariableNode: anInstanceVariable [
 { #category : #visiting }
 PlainCodeVisitor >> visitLiteralValueNode: aLiteralNode [
 	aLiteralNode value isSymbol ifFalse: [ ^ self ].
-	aLiteralNode value: (self getReplacementName: aLiteralNode value) asSymbol start: 0 stop: 0 
+	aLiteralNode value: (self getReplacementName: aLiteralNode value) asSymbol start: 0 stop: -1
 	"Bogus values, since we're parsing them back before use."
 ]
 

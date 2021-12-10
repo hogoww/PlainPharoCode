@@ -21,7 +21,7 @@ PCBlocks >> add: aBlock [
 { #category : #concatenation }
 PCBlocks >> add: aBlock withArguments: args [
 	blocks addLast: 
-		(aBlock asPCBlock 
+		(aBlock asPCBlock  
 			arguments: args)
 ]
 
@@ -45,9 +45,8 @@ PCBlocks >> asBlock [
 { #category : #ast }
 PCBlocks >> asBlock: aDictionary [
 	| arguments temporaries statements |
-	
 	asts := blocks collect: [ :aPcBlocks | aPcBlocks doReplacementsWith: aDictionary ].
-	
+
 	arguments := Set new.
 	temporaries := Set new.
 	statements := OrderedCollection new.
