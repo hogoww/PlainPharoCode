@@ -87,8 +87,8 @@ PlainCodeVisitor >> getMessageSelector: aString [
 ]
 
 { #category : #visiting }
-PlainCodeVisitor >> getReplacementName: aString [
-	(context at: aString ifAbsent:[ ^ aString ])
+PlainCodeVisitor >> getReplacementName: aString [	
+	(context at: aString ifAbsent:[ argumentDictionary at: aString ifAbsent: [ aString ] ])
 		ifNotNil: [ :value | 
 			(value isCollection and:[ value isString not])
 				ifTrue: [ ^ value ]

@@ -59,6 +59,45 @@ PlainCodeVisitorTest >> setUp [
 	parser := RBParser.
 ]
 
+{ #category : #'tests-variables' }
+PlainCodeVisitorTest >> testArgumentInStringShouldNotBeReplaced [
+	| initialBlock modifiedBlock anotherArg argReplacement |
+	"The instanceVariable is set to nil, so it shouldn't replace anything"
+	
+	anotherArg := 'something'.
+	
+	initialBlock := [ :anArg | 'anArg' ].
+	argReplacement := Dictionary new add: 'anArg' -> anotherArg ; yourself.
+	modifiedBlock := #aMethod: asMethodWithBody: initialBlock withArguments: argReplacement.
+	
+	self assert: anotherArg isNotNil.
+	self assert: (self countID: 'anArg' in: initialBlock sourceNode) equals: 2.
+	"Only the argument node should be replaced"
+	self assert: (self countID: 'anArg' in: modifiedBlock) equals: 1.
+	self assert: (self countID: 'something' in: modifiedBlock) equals: 1.
+	
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
+]
+
+{ #category : #'tests-variables' }
+PlainCodeVisitorTest >> testArgumentInSymbolShouldBeReplaced [
+	| initialBlock modifiedBlock anotherArg argReplacement |
+	"The instanceVariable is set to nil, so it shouldn't replace anything"
+	
+	anotherArg := 'something'.
+	
+	initialBlock := [ :anArg | #anArg ].
+	argReplacement := Dictionary new add: 'anArg' -> anotherArg ; yourself.
+	modifiedBlock := #aMethod: asMethodWithBody: initialBlock withArguments: argReplacement.
+	
+	self assert: anotherArg isNotNil.
+	self assert: (self countID: 'anArg' in: initialBlock sourceNode) equals: 2.
+	self assert: (self countID: 'anArg' in: modifiedBlock) equals: 0.
+	self assert: (self countID: 'something' in: modifiedBlock) equals: 2. 
+
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
+]
+
 { #category : #'tests-messages' }
 PlainCodeVisitorTest >> testBinaryKeywordsArgumentBad [
 	| b initialBlock |
