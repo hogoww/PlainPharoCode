@@ -626,6 +626,24 @@ PlainCodeVisitorTest >> testReplaceInnerArgumentWithUnsetValue [
 ]
 
 { #category : #'test-message-expand' }
+PlainCodeVisitorTest >> testReplaceInsideOfLiteralArray [
+	| initialBlock modifiedBlock k |
+	"The variable is instanciated with a value, it should therefore be replaced"
+	k := { #truc . #truc2 }.
+	initialBlock:=[ #( k ) ].
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock.
+	
+	self assert: k isNotNil.
+	self assert: (self countID: 'k' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'k' in: modifiedBlock) equals: 0.
+	self assert: (self countID: #truc in: modifiedBlock) equals: 1.
+	self assert: (self countID: #truc2 in: modifiedBlock) equals: 1.
+	self assert: modifiedBlock statements first isLiteralArray.
+
+	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
+]
+
+{ #category : #'test-message-expand' }
 PlainCodeVisitorTest >> testReplaceOneBinaryKeywordSelectorByTwoBinaryKeywordSelectors [
 	| initialBlock modifiedBlock k |
 	"The variable is instanciated with a value, it should therefore be replaced"

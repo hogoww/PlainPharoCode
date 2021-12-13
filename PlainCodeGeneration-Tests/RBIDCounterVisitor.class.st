@@ -50,8 +50,8 @@ RBIDCounterVisitor >> initialize [
 
 { #category : #visiting }
 RBIDCounterVisitor >> visitLiteralNode: aLiteralNode [
-	super visitLiteralNode:aLiteralNode.
-	aLiteralNode value=anID
+	super visitLiteralNode: aLiteralNode.
+	aLiteralNode value = anID
 	ifTrue:[count :=count + 1].
 	
 ]

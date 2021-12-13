@@ -221,6 +221,22 @@ PlainCodeVisitor >> visitInstanceVariableNode: anInstanceVariable [
 ]
 
 { #category : #visiting }
+PlainCodeVisitor >> visitLiteralArrayNode: aLiteralArrayNode [
+	| contents replacements |
+	contents := OrderedCollection new.
+	aLiteralArrayNode children 
+		do: [ :each | 
+			replacements := self getReplacementName: each value.
+			(replacements isCollection and: [ replacements isString not ]) 
+				ifTrue: [ contents addAll: replacements ]
+				ifFalse: [ contents add: replacements ] ].
+	aLiteralArrayNode contents: (contents collect: [ :aString | RBLiteralNode value: aString ])
+"	aLiteralNode value isSymbol ifFalse: [ ^ self ]."
+"	aLiteralNode value: (self getReplacementName: aLiteralNode value) asSymbol start: 0 stop: -1"
+	"Bogus values, since we're parsing them back before use."
+]
+
+{ #category : #visiting }
 PlainCodeVisitor >> visitLiteralValueNode: aLiteralNode [
 	aLiteralNode value isSymbol ifFalse: [ ^ self ].
 	aLiteralNode value: (self getReplacementName: aLiteralNode value) asSymbol start: 0 stop: -1
