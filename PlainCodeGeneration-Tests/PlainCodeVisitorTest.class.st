@@ -544,7 +544,7 @@ PlainCodeVisitorTest >> testOuterUnarySelectorChange [
 	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
-{ #category : #'tests-variables' }
+{ #category : #'test-scope' }
 PlainCodeVisitorTest >> testOverridingVariableShouldBeTakenIntoAccount [
 	| initialBlock modifiedBlock aTempVar explicitReplacement |
 	aTempVar := 'something'.
