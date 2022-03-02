@@ -40,6 +40,6 @@ BlockClosure >> asPCBlock [
 { #category : #'*PlainPharoCode' }
 BlockClosure >> asPlainCodeBC [
 	^ PCBlocks new
-		+ self ;
+		+= self ;
 		yourself
 ]

@@ -9,7 +9,7 @@ Class {
 }
 
 { #category : #concatenation }
-PCBlocks >> + aBlock [
+PCBlocks >> += aBlock [
 	self add: aBlock
 ]
 

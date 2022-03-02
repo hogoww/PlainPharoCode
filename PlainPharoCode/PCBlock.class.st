@@ -10,7 +10,7 @@ Class {
 }
 
 { #category : #accessing }
-PCBlock >> + anotherBlock [
+PCBlock >> += anotherBlock [
 	^ self add: anotherBlock
 ]
 

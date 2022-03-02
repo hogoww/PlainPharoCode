@@ -133,7 +133,7 @@ PCBlockClosureASTTest >> testPCPlusBlock [
 	"test concanating two simple blocks, without arguments."
 	aPCBlock := [ 3 ] asPCBlock.
 	aBlock := [ 4 ].
-	res := aPCBlock + aBlock.
+	res := aPCBlock += aBlock.
 	resAst := res asBlock.
 	self assert: res class equals: PCBlocks.
 	self assert: resAst class equals: RBBlockNode.
@@ -149,7 +149,7 @@ PCBlockClosureASTTest >> testPCPlusPC [
 	"test concanating two simple blocks, without arguments."
 	aPCBlock := [ 3 ] asPCBlock.
 	anotherPCBlock := [ 4 ] asPCBlock.
-	res := aPCBlock + anotherPCBlock.
+	res := aPCBlock += anotherPCBlock.
 	resAst := res asBlock.
 	self assert: res class equals: PCBlocks.
 	self assert: resAst class equals: RBBlockNode.
