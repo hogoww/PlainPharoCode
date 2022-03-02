@@ -1,16 +1,16 @@
 Extension { #name : #BlockClosure }
 
-{ #category : #'*PlainCodeGeneration' }
+{ #category : #'*PlainPharoCode' }
 BlockClosure >> + aBlock [
 	^ self add: aBlock
 ]
 
-{ #category : #'*PlainCodeGeneration' }
+{ #category : #'*PlainPharoCode' }
 BlockClosure >> add: aBlock [
 	^ self add: aBlock withArguments: {}
 ]
 
-{ #category : #'*PlainCodeGeneration' }
+{ #category : #'*PlainPharoCode' }
 BlockClosure >> add: aBlock withArguments: argumentsDictionnary [
 	^ PCBlocks new
 		add: self;
@@ -18,18 +18,18 @@ BlockClosure >> add: aBlock withArguments: argumentsDictionnary [
 		yourself
 ]
 
-{ #category : #'*PlainCodeGeneration' }
+{ #category : #'*PlainPharoCode' }
 BlockClosure >> asMethod: aSelector [
 	^ self asMethod: aSelector withArguments: Dictionary new
 
 ]
 
-{ #category : #'*PlainCodeGeneration' }
+{ #category : #'*PlainPharoCode' }
 BlockClosure >> asMethod: aSelector withArguments: aDictionary [
 	^ self asPlainCodeBC asMethod: aSelector withArguments: aDictionary
 ]
 
-{ #category : #'*PlainCodeGeneration' }
+{ #category : #'*PlainPharoCode' }
 BlockClosure >> asPCBlock [
 	^ PCBlock new
 		block: self;
@@ -37,7 +37,7 @@ BlockClosure >> asPCBlock [
 		
 ]
 
-{ #category : #'*PlainCodeGeneration' }
+{ #category : #'*PlainPharoCode' }
 BlockClosure >> asPlainCodeBC [
 	^ PCBlocks new
 		+ self ;

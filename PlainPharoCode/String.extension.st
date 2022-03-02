@@ -1,11 +1,11 @@
 Extension { #name : #String }
 
-{ #category : #'*PlainCodeGeneration' }
+{ #category : #'*PlainPharoCode' }
 String >> asMethodWithBody: aBlock [
 	^ aBlock asMethod: self
 ]
 
-{ #category : #'*PlainCodeGeneration' }
+{ #category : #'*PlainPharoCode' }
 String >> asMethodWithBody: aBlock withArguments: aDictionary [
 	^ aBlock asPlainCodeBC asMethod: self withArguments: aDictionary
 ]

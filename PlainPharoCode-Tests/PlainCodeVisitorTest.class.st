@@ -15,7 +15,7 @@ Class {
 		'anInstanceVariable',
 		'parser'
 	],
-	#category : #'PlainCodeGeneration-Tests-tests'
+	#category : #'PlainPharoCode-Tests-tests'
 }
 
 { #category : #'tests-variables' }

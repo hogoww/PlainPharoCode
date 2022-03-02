@@ -4,7 +4,7 @@ A PCBlockClosureASTTest is a test class for testing the behavior of PCBlockClosu
 Class {
 	#name : #PCBlockClosureASTTest,
 	#superclass : #TestCase,
-	#category : #'PlainCodeGeneration-Tests-tests'
+	#category : #'PlainPharoCode-Tests-tests'
 }
 
 { #category : #conversion }

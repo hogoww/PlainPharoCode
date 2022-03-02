@@ -1,6 +1,6 @@
 Extension { #name : #RBValueNode }
 
-{ #category : #'*PlainCodeGeneration' }
+{ #category : #'*PlainPharoCode' }
 RBValueNode >> statement [
 	^ self parent isSequence ifTrue:[ self ] ifFalse:[ self parent ]
 ]

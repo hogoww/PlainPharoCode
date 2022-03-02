@@ -1,6 +1,6 @@
 Extension { #name : #RBMessageNode }
 
-{ #category : #'*PlainCodeGeneration' }
+{ #category : #'*PlainPharoCode' }
 RBMessageNode >> innerMostMessage [
 	^self receiver isMessage 
 		ifTrue:[
@@ -12,12 +12,12 @@ RBMessageNode >> innerMostMessage [
 		
 ]
 
-{ #category : #'*PlainCodeGeneration' }
+{ #category : #'*PlainPharoCode' }
 RBMessageNode >> isInnerMessage [
 	^parent isSequence not & parent isReturn not
 ]
 
-{ #category : #'*PlainCodeGeneration' }
+{ #category : #'*PlainPharoCode' }
 RBMessageNode >> outerMostMessage [
 	^self isInnerMessage
 		ifTrue:[

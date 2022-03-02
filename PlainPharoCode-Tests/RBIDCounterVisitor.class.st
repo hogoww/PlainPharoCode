@@ -25,7 +25,7 @@ Class {
 		'count',
 		'anID'
 	],
-	#category : #'PlainCodeGeneration-Tests-support'
+	#category : #'PlainPharoCode-Tests-support'
 }
 
 { #category : #accessing }

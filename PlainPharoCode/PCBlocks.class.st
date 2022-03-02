@@ -5,7 +5,7 @@ Class {
 		'blocks',
 		'asts'
 	],
-	#category : #'PlainCodeGeneration-format'
+	#category : #'PlainPharoCode-format'
 }
 
 { #category : #concatenation }

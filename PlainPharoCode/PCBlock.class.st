@@ -6,7 +6,7 @@ Class {
 		'arguments',
 		'variables'
 	],
-	#category : #'PlainCodeGeneration-format'
+	#category : #'PlainPharoCode-format'
 }
 
 { #category : #accessing }

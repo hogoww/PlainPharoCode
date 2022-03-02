@@ -25,7 +25,7 @@ Class {
 		'context',
 		'explicitReplacement'
 	],
-	#category : #'PlainCodeGeneration-format'
+	#category : #'PlainPharoCode-format'
 }
 
 { #category : #formatting }

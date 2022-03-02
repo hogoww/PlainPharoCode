@@ -1,6 +1,6 @@
 Extension { #name : #RBReturnNode }
 
-{ #category : #'*PlainCodeGeneration' }
+{ #category : #'*PlainPharoCode' }
 RBReturnNode >> statement [
 	^ self parent isSequence ifTrue:[ self ] ifFalse:[ self parent ]
 ]

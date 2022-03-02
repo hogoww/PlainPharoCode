@@ -1,6 +1,6 @@
 Extension { #name : #RBProgramNode }
 
-{ #category : #'*PlainCodeGeneration' }
+{ #category : #'*PlainPharoCode' }
 RBProgramNode >> statement [
 	
 ]

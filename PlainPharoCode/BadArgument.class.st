@@ -5,7 +5,7 @@ Class {
 		'expected',
 		'result'
 	],
-	#category : #'PlainCodeGeneration-error'
+	#category : #'PlainPharoCode-error'
 }
 
 { #category : #accessing }

@@ -15,5 +15,5 @@ which is not possible.
 Class {
 	#name : #ExpandReturnError,
 	#superclass : #Error,
-	#category : #'PlainCodeGeneration-error'
+	#category : #'PlainPharoCode-error'
 }
