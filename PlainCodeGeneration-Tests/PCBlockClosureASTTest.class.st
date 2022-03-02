@@ -115,7 +115,6 @@ PCBlockClosureASTTest >> testPCBlockClosureAdditionWithoutArguments [
 { #category : #'block-concatenation-test' }
 PCBlockClosureASTTest >> testPCBlockClosureShouldNotModifyInitialBlock [
 	| aPCBlock anotherPCBlock res resAst |
-	"seems to work when done step by step but not fwhen executed as one code block.."
 	aPCBlock := [:a| a ].
 	anotherPCBlock := [: b| b ].
 	res := aPCBlock + anotherPCBlock.
@@ -124,8 +123,8 @@ PCBlockClosureASTTest >> testPCBlockClosureShouldNotModifyInitialBlock [
 	self assert: aPCBlock argumentCount equals: 1.
 	self assert: aPCBlock argumentNames equals: #(a).
 
-	self assert: aPCBlock argumentCount equals: 1.
-	self assert: aPCBlock argumentNames equals: #(b).
+	self assert: anotherPCBlock argumentCount equals: 1.
+	self assert: anotherPCBlock argumentNames equals: #(b).
 ]
 
 { #category : #'additions-tests' }
