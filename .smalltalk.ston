@@ -7,6 +7,6 @@ SmalltalkCISpec {
         }
     ],
   #testing : {
-        #categories: [ 'PlainCodeGeneration*' ]
+        #categories: [ 'PlainPharoCode*' ]
   }
 }
