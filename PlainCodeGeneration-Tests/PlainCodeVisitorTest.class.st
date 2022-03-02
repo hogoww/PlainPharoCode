@@ -544,6 +544,20 @@ PlainCodeVisitorTest >> testOuterUnarySelectorChange [
 	self shouldnt: [ parser parseMethod: modifiedBlock asString ] raise: Error
 ]
 
+{ #category : #'tests-variables' }
+PlainCodeVisitorTest >> testOverridingVariableShouldBeTakenIntoAccount [
+	| initialBlock modifiedBlock aTempVar explicitReplacement |
+	aTempVar := 'something'.
+	
+	initialBlock := [ aTempVar ].
+	explicitReplacement := {'aTempVar' -> nil} asDictionary ; yourself.
+	modifiedBlock := #aMethod asMethodWithBody: initialBlock withArguments: explicitReplacement.
+	
+	self assert: aTempVar isNotNil.
+	self assert: (self countID: 'aTempVar' in: initialBlock sourceNode) equals: 1.
+	self assert: (self countID: 'aTempVar' in: modifiedBlock) equals: 1.
+]
+
 { #category : #'test-variable-expand' }
 PlainCodeVisitorTest >> testReceiverVariableNodeExpand [
 	| initialBlock modifiedBlock a |

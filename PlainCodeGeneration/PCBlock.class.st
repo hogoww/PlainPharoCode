@@ -79,11 +79,11 @@ PCBlock >> block: aBlock [
 PCBlock >> doReplacementsWith: aDictionary [
 	| visitor resAST |
 	visitor := PlainCodeVisitor new
-		context: variables ;
-		argumentDictionary:
-			(aDictionary
+		explicitReplacements:
+			(aDictionary asDictionary
 				addAll: arguments;
 				yourself);
+		context: variables;
 		yourself.
 	resAST := block sourceNode copy.
 	resAST acceptVisitor: visitor.

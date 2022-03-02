@@ -23,7 +23,7 @@ Class {
 	#superclass : #RBProgramNodeVisitor,
 	#instVars : [
 		'context',
-		'argumentDictionary'
+		'explicitReplacement'
 	],
 	#category : #'PlainCodeGeneration-format'
 }
@@ -31,18 +31,6 @@ Class {
 { #category : #formatting }
 PlainCodeVisitor >> aCodeGeneratorFromBlock: aPlainCodeBlock andArguments: aDictionary [
 	^ aPlainCodeBlock asPlainCodeBC asBlock: aDictionary
-]
-
-{ #category : #accessing }
-PlainCodeVisitor >> argumentDictionary [
-	<ignoreForCoverage>
-	^ argumentDictionary
-]
-
-{ #category : #accessing }
-PlainCodeVisitor >> argumentDictionary: aDictionary [
-	<ignoreForCoverage>
-	^ argumentDictionary := aDictionary
 ]
 
 { #category : #accessing }
@@ -55,6 +43,18 @@ PlainCodeVisitor >> context [
 PlainCodeVisitor >> context: aContext [
 	<ignoreForCoverage>
 	^ context := aContext
+]
+
+{ #category : #accessing }
+PlainCodeVisitor >> explicitReplacements [
+	<ignoreForCoverage>
+	^ explicitReplacement
+]
+
+{ #category : #accessing }
+PlainCodeVisitor >> explicitReplacements: aDictionary [
+	<ignoreForCoverage>
+	^ explicitReplacement := aDictionary
 ]
 
 { #category : #formatting }
@@ -71,7 +71,7 @@ PlainCodeVisitor >> generateCode: aSelector withBody: aBlock andArguments: aDict
 
 	updatedBlock := self aCodeGeneratorFromBlock: aBlock andArguments: aDictionnary.
 
-	^RBMethodNode
+	^ RBMethodNode
 		selector: aSelector
 		arguments: updatedBlock arguments
 		body: updatedBlock body
@@ -88,12 +88,17 @@ PlainCodeVisitor >> getMessageSelector: aString [
 
 { #category : #visiting }
 PlainCodeVisitor >> getReplacementName: aString [	
-	(context at: aString ifAbsent:[ argumentDictionary at: aString ifAbsent: [ aString ] ])
+	(self lookUpName: aString)
 		ifNotNil: [ :value | 
 			(value isCollection and:[ value isString not])
 				ifTrue: [ ^ value ]
 				ifFalse: [ ^ value asString ] ].
 	^ aString
+]
+
+{ #category : #visiting }
+PlainCodeVisitor >> lookUpName: aString [
+	^ explicitReplacement at: aString ifAbsent:[ context at: aString ifAbsent: [ nil ] ]
 ]
 
 { #category : #expand }
@@ -155,7 +160,7 @@ PlainCodeVisitor >> variableExpandsInMultipleVariables: aNode [
 	omm:=aNode parent outerMostMessage.
 	omm parent isReturn ifTrue:[ ^ ExpandReturnError new signal ].
 	
-	res:=(context at: aNode name ifAbsent:[nil]) collect:[:aStatement| 
+	res := (self lookUpName: aNode name) collect:[:aStatement| 
 		omm copy innerMostMessage receiver: (RBVariableNode named:aStatement)
 		].
 	omm parent replaceNode: omm withNodes: res.
@@ -165,7 +170,7 @@ PlainCodeVisitor >> variableExpandsInMultipleVariables: aNode [
 PlainCodeVisitor >> variablesNodesVisit: aNode [
 	"visits for IV/argument/temporary nodes"
 	| resolvedVariable |
-	resolvedVariable := context at: aNode name ifAbsent:[ nil ].
+	resolvedVariable := self lookUpName: aNode name.
 	resolvedVariable ifNil: [ ^ self ].
 	resolvedVariable isArray
 		ifTrue: [ resolvedVariable
@@ -184,7 +189,7 @@ PlainCodeVisitor >> visitArgumentNode: anArgumentNode [
 	| replacementName |
 	"This will take care of the replacing the inner block's arguments
 	[:b| b ] with the dictionary containing 'b'->a and a:=c will output the method with the body [:c| c ]"
-	replacementName:=argumentDictionary at:anArgumentNode name ifAbsent:[
+	replacementName:= (self lookUpName: anArgumentNode name) ifNil:[
 		^self variablesNodesVisit: anArgumentNode.
 		].
 	replacementName ifNotNil:[
@@ -199,7 +204,7 @@ PlainCodeVisitor >> visitAssignmentNode: anAssignmentNode [
 
 	anAssignmentNode value acceptVisitor:self.
 
-	resolvedName := context at: anAssignmentNode variable name ifAbsent:[ nil ].
+	resolvedName := self lookUpName: anAssignmentNode variable name.
 	resolvedName ifNil:[ ^self ].
 	
 	resolvedName isArray ifFalse:[resolvedName := { resolvedName } ].
