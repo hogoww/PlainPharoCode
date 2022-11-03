@@ -23,3 +23,5 @@ Unit tests show some more small examples. Here's some bigger ones from another p
 ![Example #2](./images/ex2.png)
 
 ![Example #3](./images/ex3.png)
+
+A bit more information is available in this [mailing list thread](https://lists.pharo.org/empathy/thread/55WTZMWMU5OPG7JUCXUGBZKSJRQYE55X?hash=EMWJVUBPHDFOAIAMSJSHCP5IHHMAYH3I#EMWJVUBPHDFOAIAMSJSHCP5IHHMAYH3I).
